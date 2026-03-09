@@ -1,5 +1,5 @@
-import Groq from "groq-sdk";
-import { createClient } from "@supabase/supabase-js";
+const Groq = require("groq-sdk");
+const { createClient } = require("@supabase/supabase-js");
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const supabase = createClient(
@@ -7,8 +7,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-export default async function handler(req, res) {
-  // CORS
+module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -17,12 +16,10 @@ export default async function handler(req, res) {
 
   try {
     const { messages, systemPrompt, userId } = req.body;
-
     if (!messages || !systemPrompt) {
       return res.status(400).json({ error: "Missing messages or systemPrompt" });
     }
 
-    // Rate limiting: max 50 messages per user per day
     if (userId) {
       const today = new Date().toISOString().split("T")[0];
       const { data: usage } = await supabase
@@ -31,13 +28,10 @@ export default async function handler(req, res) {
         .eq("user_id", userId)
         .eq("date", today)
         .single();
-
       const currentCount = usage?.count || 0;
       if (currentCount >= 50) {
         return res.status(429).json({ error: "Limite diário de 50 mensagens atingido. Tente amanhã!" });
       }
-
-      // Increment usage
       await supabase.from("usage").upsert({
         user_id: userId,
         date: today,
@@ -57,9 +51,8 @@ export default async function handler(req, res) {
 
     const reply = completion.choices[0]?.message?.content || "";
     return res.status(200).json({ reply });
-
   } catch (err) {
     console.error("Chat error:", err);
     return res.status(500).json({ error: err.message || "Internal server error" });
   }
-}
+};
