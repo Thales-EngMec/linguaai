@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaAI – Guia de Publicação</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0f1e;--surface:#111827;--surface2:#1f2937;--border:#2d3748;--accent:#3b82f6;--accent2:#8b5cf6;--green:#10b981;--gold:#f59e0b;--red:#ef4444;--text:#f1f5f9;--muted:#94a3b8;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.6;}
+  a{color:var(--accent);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  /* HEADER */
+  .hero{background:linear-gradient(135deg,#0f172a,#1e1b4b);padding:60px 24px;text-align:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,#3b82f622,transparent);}
+  .hero-logo{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;background:linear-gradient(135deg,#60a5fa,#a78bfa,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;}
+  .hero-sub{color:var(--muted);font-size:18px;margin-top:8px;font-weight:300;position:relative;}
+  .hero-badges{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;position:relative;}
+  .badge{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid;}
+  .badge.green{background:#064e3b22;border-color:#10b98144;color:#34d399;}
+  .badge.blue{background:#1e3a5f22;border-color:#3b82f644;color:#93c5fd;}
+  .badge.purple{background:#2e1065 22;border-color:#8b5cf644;color:#c4b5fd;}
+
+  /* LAYOUT */
+  .container{max-width:900px;margin:0 auto;padding:0 24px 80px;}
+
+  /* PROGRESS NAV */
+  .progress-nav{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;padding:0 24px;}
+  .progress-inner{max-width:900px;margin:0 auto;display:flex;overflow-x:auto;gap:0;}
+  .nav-step{display:flex;align-items:center;gap:8px;padding:14px 16px;color:var(--muted);font-size:13px;font-weight:600;white-space:nowrap;border-bottom:2px solid transparent;cursor:pointer;text-decoration:none;transition:all .2s;}
+  .nav-step:hover{color:var(--text);}
+  .nav-step.done{color:var(--green);}
+  .nav-step span{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--surface2);flex-shrink:0;}
+  .nav-step.done span{background:#064e3b;color:var(--green);}
+
+  /* STEP SECTIONS */
+  .step-section{margin-top:48px;}
+  .step-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+  .step-number{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:22px;flex-shrink:0;}
+  .step-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;}
+  .step-subtitle{color:var(--muted);font-size:14px;margin-top:2px;}
+  .time-badge{margin-left:auto;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--muted);white-space:nowrap;}
+
+  /* INSTRUCTION BLOCKS */
+  .instructions{display:flex;flex-direction:column;gap:16px;}
+  .instruction{display:flex;gap:14px;align-items:flex-start;}
+  .inst-num{width:28px;height:28px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;margin-top:2px;}
+  .inst-body{flex:1;}
+  .inst-title{font-weight:600;font-size:15px;margin-bottom:4px;}
+  .inst-desc{color:var(--muted);font-size:14px;}
+
+  /* VISUAL MOCKUPS */
+  .mockup{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin:16px 0;position:relative;}
+  .mockup-bar{background:var(--surface2);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+  .mockup-dots{display:flex;gap:5px;}
+  .mockup-dot{width:10px;height:10px;border-radius:50%;}
+  .mockup-url{flex:1;background:var(--bg);border-radius:6px;padding:4px 12px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin:0 8px;}
+  .mockup-body{padding:20px;}
+
+  /* HIGHLIGHT BOXES */
+  .highlight{border-radius:12px;padding:14px 16px;margin:12px 0;display:flex;gap:12px;align-items:flex-start;}
+  .highlight.tip{background:#0c1a33;border:1px solid #1e40af44;}
+  .highlight.warn{background:#1c1207;border:1px solid #92400e44;}
+  .highlight.success{background:#052e16;border:1px solid #14532d44;}
+  .highlight-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+  .highlight-text{font-size:14px;color:var(--muted);}
+  .highlight-text strong{color:var(--text);display:block;margin-bottom:2px;}
+
+  /* CODE BLOCKS */
+  .code-block{background:#0d1117;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;font-family:'DM Mono',monospace;font-size:13px;overflow-x:auto;position:relative;}
+  .code-block .code-label{font-size:10px;color:var(--muted);font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600;}
+  .code-block pre{line-height:1.7;color:#e2e8f0;}
+  .kw{color:#c792ea;} .str{color:#c3e88d;} .cmt{color:#546e7a;} .fn{color:#82aaff;} .num{color:#f78c6c;}
+
+  /* TABLE */
+  .table-wrap{overflow-x:auto;margin:16px 0;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--surface2);color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+  td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:14px;}
+  tr:last-child td{border-bottom:none;}
+  .td-key{font-family:'DM Mono',monospace;color:#93c5fd;font-size:13px;}
+  .td-val{color:var(--muted);font-size:13px;}
+
+  /* ARROWS / INDICATORS */
+  .arrow-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin:8px 0;display:flex;align-items:center;gap:10px;font-size:14px;}
+  .arrow-box .arrow{color:var(--accent);font-size:18px;}
+
+  /* CLICK INDICATOR */
+  .click-here{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+
+  /* FAKE UI ELEMENTS */
+  .fake-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:white;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;}
+  .fake-btn.outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .fake-btn.green{background:linear-gradient(135deg,#059669,#10b981);}
+  .fake-input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;width:100%;margin:4px 0;}
+  .fake-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:10px;margin-bottom:4px;display:block;}
+  .fake-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px;}
+  .fake-nav-item{padding:8px 16px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;cursor:default;}
+  .fake-nav-item.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .pulse-ring{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px #3b82f622;animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 #3b82f644}50%{box-shadow:0 0 0 8px #3b82f611}}
+
+  /* FINAL */
+  .final-card{background:linear-gradient(135deg,#0f172a,#1e1b4b);border:1px solid #312e81;border-radius:20px;padding:36px;text-align:center;margin-top:48px;}
+  .final-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;}
+  .final-sub{color:var(--muted);margin-bottom:24px;}
+  .limits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;}
+  .limit-card{background:#0a0f1e;border:1px solid var(--border);border-radius:12px;padding:16px;}
+  .limit-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:var(--green);}
+  .limit-label{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  @media(max-width:600px){.limits-grid{grid-template-columns:1fr;}.step-header{flex-wrap:wrap;}.time-badge{margin-left:0;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-logo">LinguaAI</div>
+  <div class="hero-sub">Guia completo para publicar seu site na internet</div>
+  <div class="hero-badges">
+    <span class="badge green">✓ 100% Gratuito</span>
+    <span class="badge blue">⏱ ~30 minutos</span>
+    <span class="badge purple">🚀 Sem precisar programar</span>
+  </div>
+</div>
+
+<nav class="progress-nav">
+  <div class="progress-inner">
+    <a class="nav-step" href="#step1"><span>1</span> Groq (IA)</a>
+    <a class="nav-step" href="#step2"><span>2</span> Supabase (Banco)</a>
+    <a class="nav-step" href="#step3"><span>3</span> Configurar Código</a>
+    <a class="nav-step" href="#step4"><span>4</span> GitHub</a>
+    <a class="nav-step" href="#step5"><span>5</span> Vercel (Publicar)</a>
+    <a class="nav-step" href="#step6"><span>6</span> Pronto!</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- ═══ STEP 1 – GROQ ═══ -->
+  <section class="step-section" id="step1">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <div>
+        <div class="step-title">Criar conta no Groq</div>
+        <div class="step-subtitle">A IA que vai alimentar seu tutor — gratuita e muito rápida</div>
+      </div>
+      <div class="time-badge">⏱ ~3 min</div>
+    </div>
+
+    <div class="instructions">
+      <div class="instruction">
+        <div class="inst-num">1</div>
+        <div class="inst-body">
+          <div class="inst-title">Acesse o site do Groq</div>
+          <div class="inst-desc">Abra uma nova aba e vá para → <a href="https://console.groq.com" target="_blank">console.groq.com</a></div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">2</div>
+        <div class="inst-body">
+          <div class="inst-title">Crie uma conta gratuita</div>
+          <div class="inst-desc">Clique em "Sign Up" e entre com sua conta do Google ou crie com e-mail.</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">console.groq.com</div>
+            </div>
+            <div class="mockup-body" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+              <div class="fake-btn outline">Log in</div>
+              <div class="fake-btn" style="position:relative">Sign Up ← <span class="pulse-ring" style="margin-left:6px"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">3</div>
+        <div class="inst-body">
+          <div class="inst-title">Crie sua API Key</div>
+          <div class="inst-desc">Após entrar, no menu lateral esquerdo clique em <strong>"API Keys"</strong>, depois em <strong>"Create API Key"</strong>.</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">console.groq.com/keys</div>
+            </div>
+            <div class="mockup-body">
+              <div style="display:flex;gap:16px">
+                <div style="width:140px;flex-shrink:0">
+                  <div style="font-size:12px;color:var(--muted);padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:4px">Dashboard</div>
+                  <div style="font-size:13px;padding:8px 10px;background:var(--surface2);border-radius:6px;color:var(--accent);font-weight:600">🔑 API Keys <span class="pulse-ring" style="margin-left:4px"></span></div>
+                  <div style="font-size:12px;color:var(--muted);padding:8px 0">Playground</div>
+                  <div style="font-size:12px;color:var(--muted);padding:8px 0">Usage</div>
+                </div>
+                <div style="flex:1">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                    <div style="font-size:16px;font-weight:700">API Keys</div>
+                    <div class="fake-btn green" style="font-size:12px;padding:6px 14px">+ Create API Key <span class="pulse-ring" style="margin-left:6px"></span></div>
+                  </div>
+                  <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;color:var(--muted);text-align:center">Nenhuma chave criada ainda</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">4</div>
+        <div class="inst-body">
+          <div class="inst-title">Copie e salve a chave</div>
+          <div class="inst-desc">Ela vai aparecer assim — <strong>copie agora</strong>, pois não aparece novamente!</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-body">
+              <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Sua nova API Key (salve agora!):</div>
+              <div style="background:var(--bg);border:1px solid var(--green);border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+                <code style="font-family:'DM Mono',monospace;font-size:13px;color:#34d399">gsk_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890</code>
+                <div class="fake-btn" style="font-size:11px;padding:4px 10px;flex-shrink:0">📋 Copiar</div>
+              </div>
+              <div class="highlight warn" style="margin-top:10px">
+                <div class="highlight-icon">⚠️</div>
+                <div class="highlight-text"><strong>Atenção!</strong> Ela só aparece uma vez. Salve num bloco de notas antes de fechar.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STEP 2 – SUPABASE ═══ -->
+  <section class="step-section" id="step2">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <div>
+        <div class="step-title">Criar conta no Supabase</div>
+        <div class="step-subtitle">Banco de dados + autenticação de usuários, tudo gratuito</div>
+      </div>
+      <div class="time-badge">⏱ ~8 min</div>
+    </div>
+
+    <div class="instructions">
+      <div class="instruction">
+        <div class="inst-num">1</div>
+        <div class="inst-body">
+          <div class="inst-title">Acesse o Supabase</div>
+          <div class="inst-desc">→ <a href="https://supabase.com" target="_blank">supabase.com</a> → clique em <strong>"Start for free"</strong> → entre com sua conta do GitHub ou Google.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">2</div>
+        <div class="inst-body">
+          <div class="inst-title">Crie um novo projeto</div>
+          <div class="inst-desc">No painel, clique em <strong>"New project"</strong> e preencha assim:</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">app.supabase.com/new/project</div>
+            </div>
+            <div class="mockup-body">
+              <span class="fake-label">Project name</span>
+              <div class="fake-input">linguaai</div>
+              <span class="fake-label">Database password</span>
+              <div class="fake-input" style="color:var(--text)">MinhaS3nhaForte!123</div>
+              <span class="fake-label">Region</span>
+              <div class="fake-input" style="color:var(--text)">South America (São Paulo) ← escolha essa!</div>
+              <div style="margin-top:16px;display:flex;justify-content:flex-end">
+                <div class="fake-btn green">Create new project</div>
+              </div>
+            </div>
+          </div>
+          <div class="highlight tip">
+            <div class="highlight-icon">💡</div>
+            <div class="highlight-text"><strong>Aguarde ~2 minutos</strong> para o projeto ser criado. Uma barra de progresso vai aparecer.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">3</div>
+        <div class="inst-body">
+          <div class="inst-title">Abra o SQL Editor e crie as tabelas</div>
+          <div class="inst-desc">No menu lateral esquerdo, clique no ícone de banco de dados <strong>"SQL Editor"</strong>, depois em <strong>"New query"</strong>.</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">app.supabase.com/project/xxx/sql</div>
+            </div>
+            <div class="mockup-body" style="display:flex;gap:12px">
+              <div style="width:44px;display:flex;flex-direction:column;align-items:center;gap:14px;border-right:1px solid var(--border);padding-right:12px">
+                <div style="font-size:20px;opacity:.4">🏠</div>
+                <div style="font-size:20px;opacity:.4">📋</div>
+                <div style="font-size:20px;background:var(--surface2);padding:6px;border-radius:8px">🗄️</div>
+                <div style="font-size:10px;color:var(--accent);text-align:center">SQL<br>Editor</div>
+                <div style="font-size:20px;opacity:.4">⚙️</div>
+              </div>
+              <div style="flex:1">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                  <div style="font-weight:600">SQL Editor</div>
+                  <div class="fake-btn" style="font-size:11px;padding:5px 12px">+ New query <span class="pulse-ring" style="margin-left:4px"></span></div>
+                </div>
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">
+                  Cole o SQL aqui e clique em Run ▶
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+          <div class="code-block">
+            <div class="code-label">Cole este SQL completo e clique em "Run ▶"</div>
+            <pre><span class="cmt">-- Tabela de perfis dos usuários</span>
+<span class="kw">CREATE TABLE</span> profiles (
+  id UUID <span class="kw">PRIMARY KEY REFERENCES</span> auth.users(id),
+  name TEXT,
+  lang TEXT <span class="kw">DEFAULT</span> <span class="str">'en'</span>,
+  level INTEGER <span class="kw">DEFAULT</span> <span class="num">0</span>,
+  age TEXT, profession TEXT,
+  goals TEXT, interests TEXT,
+  reasons TEXT[], sports TEXT[],
+  movies TEXT[], personality TEXT[],
+  updated_at TIMESTAMPTZ <span class="kw">DEFAULT NOW</span>()
+);
+
+<span class="cmt">-- Controle de uso diário</span>
+<span class="kw">CREATE TABLE</span> usage (
+  id SERIAL <span class="kw">PRIMARY KEY</span>,
+  user_id UUID <span class="kw">REFERENCES</span> auth.users(id),
+  date DATE <span class="kw">NOT NULL</span>,
+  count INTEGER <span class="kw">DEFAULT</span> <span class="num">0</span>,
+  <span class="kw">UNIQUE</span>(user_id, date)
+);
+
+<span class="cmt">-- Segurança</span>
+<span class="kw">ALTER TABLE</span> profiles <span class="kw">ENABLE ROW LEVEL SECURITY</span>;
+<span class="kw">ALTER TABLE</span> usage <span class="kw">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="kw">CREATE POLICY</span> <span class="str">"read own profile"</span> <span class="kw">ON</span> profiles
+  <span class="kw">FOR SELECT USING</span> (auth.uid() = id);
+<span class="kw">CREATE POLICY</span> <span class="str">"insert own profile"</span> <span class="kw">ON</span> profiles
+  <span class="kw">FOR INSERT WITH CHECK</span> (auth.uid() = id);
+<span class="kw">CREATE POLICY</span> <span class="str">"update own profile"</span> <span class="kw">ON</span> profiles
+  <span class="kw">FOR UPDATE USING</span> (auth.uid() = id);
+<span class="kw">CREATE POLICY</span> <span class="str">"manage usage"</span> <span class="kw">ON</span> usage
+  <span class="kw">FOR ALL USING</span> (<span class="kw">true</span>);</pre>
+          </div>
+          </div>
+          <div class="highlight success">
+            <div class="highlight-icon">✅</div>
+            <div class="highlight-text"><strong>Deve aparecer:</strong> "Success. No rows returned" — isso é normal, significa que funcionou!</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">4</div>
+        <div class="inst-body">
+          <div class="inst-title">Pegue suas chaves de acesso</div>
+          <div class="inst-desc">No menu lateral, clique em <strong>⚙️ Settings</strong> → depois em <strong>API</strong>. Você vai ver esta tela:</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">app.supabase.com/project/xxx/settings/api</div>
+            </div>
+            <div class="mockup-body">
+              <div class="fake-nav">
+                <div class="fake-nav-item">General</div>
+                <div class="fake-nav-item active">API ← clique aqui</div>
+                <div class="fake-nav-item">Database</div>
+                <div class="fake-nav-item">Auth</div>
+              </div>
+              <div style="margin-bottom:16px">
+                <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">PROJECT URL <span class="click-here">📋 copie isso</span></div>
+                <div style="background:var(--bg);border:1px solid var(--green);border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:12px;color:#34d399">https://abcdefghijk.supabase.co</div>
+              </div>
+              <div style="margin-bottom:16px">
+                <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">ANON / PUBLIC KEY <span class="click-here">📋 copie isso</span></div>
+                <div style="background:var(--bg);border:1px solid var(--green);border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:12px;color:#34d399">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI...</div>
+              </div>
+              <div>
+                <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">SERVICE ROLE KEY <span class="click-here">📋 copie isso</span></div>
+                <div style="background:var(--bg);border:1px solid #7f1d1d;border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:12px;color:#fca5a5">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9y...</div>
+              </div>
+            </div>
+          </div>
+          <div class="highlight warn">
+            <div class="highlight-icon">⚠️</div>
+            <div class="highlight-text"><strong>Service Role Key é secreta!</strong> Nunca coloque ela no HTML público. Só vai no servidor (Vercel).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STEP 3 – CONFIG ═══ -->
+  <section class="step-section" id="step3">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <div>
+        <div class="step-title">Configurar o código</div>
+        <div class="step-subtitle">Colocar as chaves do Supabase no arquivo HTML</div>
+      </div>
+      <div class="time-badge">⏱ ~2 min</div>
+    </div>
+
+    <div class="instructions">
+      <div class="instruction">
+        <div class="inst-num">1</div>
+        <div class="inst-body">
+          <div class="inst-title">Abra o arquivo <code style="background:var(--surface2);padding:2px 8px;border-radius:4px;font-size:13px">public/index.html</code></div>
+          <div class="inst-desc">Abra com o Bloco de Notas (Windows) ou TextEdit (Mac). Use Ctrl+F para encontrar a parte abaixo:</div>
+          <div class="code-block" style="margin-top:12px">
+            <div class="code-label">Encontre estas linhas (linha ~10 do script)</div>
+            <pre><span class="kw">const</span> CONFIG = {
+  SUPABASE_URL: <span class="str">'COLE_SUA_SUPABASE_URL_AQUI'</span>,
+  SUPABASE_ANON_KEY: <span class="str">'COLE_SUA_SUPABASE_ANON_KEY_AQUI'</span>,
+  API_BASE: <span class="str">''</span>,
+};</pre>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin:8px 0;color:var(--muted);font-size:13px">↓ substitua pelos seus valores ↓</div>
+          <div class="code-block">
+            <div class="code-label">Resultado final (exemplo)</div>
+            <pre><span class="kw">const</span> CONFIG = {
+  SUPABASE_URL: <span class="str">'https://abcdefghijk.supabase.co'</span>,
+  SUPABASE_ANON_KEY: <span class="str">'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'</span>,
+  API_BASE: <span class="str">''</span>, <span class="cmt">// deixe vazio</span>
+};</pre>
+          </div>
+          <div class="highlight tip">
+            <div class="highlight-icon">💡</div>
+            <div class="highlight-text"><strong>Salve o arquivo</strong> após editar (Ctrl+S).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STEP 4 – GITHUB ═══ -->
+  <section class="step-section" id="step4">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <div>
+        <div class="step-title">Criar repositório no GitHub</div>
+        <div class="step-subtitle">O GitHub vai guardar seus arquivos — o Vercel puxa daqui</div>
+      </div>
+      <div class="time-badge">⏱ ~5 min</div>
+    </div>
+
+    <div class="instructions">
+      <div class="instruction">
+        <div class="inst-num">1</div>
+        <div class="inst-body">
+          <div class="inst-title">Crie uma conta no GitHub</div>
+          <div class="inst-desc">→ <a href="https://github.com" target="_blank">github.com</a> → "Sign up" → siga o processo normalmente.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">2</div>
+        <div class="inst-body">
+          <div class="inst-title">Crie um novo repositório</div>
+          <div class="inst-desc">Clique no <strong>"+"</strong> no canto superior direito → <strong>"New repository"</strong></div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">github.com/new</div>
+            </div>
+            <div class="mockup-body">
+              <span class="fake-label">Repository name</span>
+              <div class="fake-input" style="color:var(--text)">linguaai</div>
+              <div style="display:flex;gap:10px;margin:14px 0;align-items:center">
+                <div style="width:16px;height:16px;border-radius:50%;border:2px solid var(--accent);background:var(--accent)"></div>
+                <span style="font-size:14px">Public ← selecione isso</span>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                <div class="fake-btn green">Create repository</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">3</div>
+        <div class="inst-body">
+          <div class="inst-title">Faça upload dos arquivos</div>
+          <div class="inst-desc">Na página do repositório criado, clique em <strong>"uploading an existing file"</strong>:</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">github.com/seuusuario/linguaai</div>
+            </div>
+            <div class="mockup-body" style="text-align:center;padding:30px">
+              <div style="font-size:28px;margin-bottom:12px">📁</div>
+              <div style="font-size:14px;color:var(--muted)">Get started by <a style="color:var(--accent)">creating a new file</a> or <span style="color:var(--accent);cursor:pointer;text-decoration:underline">uploading an existing file</span> ← clique aqui</div>
+            </div>
+          </div>
+          <div class="highlight tip" style="margin-top:12px">
+            <div class="highlight-icon">📂</div>
+            <div class="highlight-text">
+              <strong>Arraste TODOS os arquivos da pasta linguaai/ de uma vez:</strong>
+              <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+                <div class="arrow-box" style="margin:3px 0;padding:8px 12px"><span style="font-family:'DM Mono',monospace;font-size:13px">📄 vercel.json</span></div>
+                <div class="arrow-box" style="margin:3px 0;padding:8px 12px"><span style="font-family:'DM Mono',monospace;font-size:13px">📄 package.json</span></div>
+                <div class="arrow-box" style="margin:3px 0;padding:8px 12px"><span style="font-family:'DM Mono',monospace;font-size:13px">📁 api/ → chat.js e profile.js</span></div>
+                <div class="arrow-box" style="margin:3px 0;padding:8px 12px"><span style="font-family:'DM Mono',monospace;font-size:13px">📁 public/ → index.html</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="highlight warn">
+            <div class="highlight-icon">⚠️</div>
+            <div class="highlight-text"><strong>Importante:</strong> O GitHub pode não manter as subpastas ao arrastar. Se isso acontecer, crie as pastas <code>api</code> e <code>public</code> manualmente clicando em "Create new file", digitando <code>api/chat.js</code> e colando o conteúdo.</div>
+          </div>
+          <div style="margin-top:12px">
+            <div style="font-size:14px;margin-bottom:8px;font-weight:600">Após o upload, clique em:</div>
+            <div class="fake-btn green" style="display:inline-flex">Commit changes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STEP 5 – VERCEL ═══ -->
+  <section class="step-section" id="step5">
+    <div class="step-header">
+      <div class="step-number">5</div>
+      <div>
+        <div class="step-title">Publicar no Vercel</div>
+        <div class="step-subtitle">Aqui seu site vai ao ar na internet — de graça</div>
+      </div>
+      <div class="time-badge">⏱ ~5 min</div>
+    </div>
+
+    <div class="instructions">
+      <div class="instruction">
+        <div class="inst-num">1</div>
+        <div class="inst-body">
+          <div class="inst-title">Crie conta no Vercel com GitHub</div>
+          <div class="inst-desc">→ <a href="https://vercel.com" target="_blank">vercel.com</a> → <strong>"Sign Up"</strong> → <strong>"Continue with GitHub"</strong> → autorize o acesso.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">2</div>
+        <div class="inst-body">
+          <div class="inst-title">Importe seu repositório</div>
+          <div class="inst-desc">Clique em <strong>"New Project"</strong> → encontre o repositório <code>linguaai</code> → clique em <strong>"Import"</strong>.</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">vercel.com/new</div>
+            </div>
+            <div class="mockup-body">
+              <div style="font-size:13px;color:var(--muted);margin-bottom:12px">Import Git Repository</div>
+              <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="font-size:18px">📦</span>
+                  <div>
+                    <div style="font-size:14px;font-weight:600">linguaai</div>
+                    <div style="font-size:12px;color:var(--muted)">seuusuario/linguaai</div>
+                  </div>
+                </div>
+                <div class="fake-btn" style="font-size:12px;padding:6px 14px">Import <span class="pulse-ring" style="margin-left:4px"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">3</div>
+        <div class="inst-body">
+          <div class="inst-title">⚡ Parte mais importante — Variáveis de ambiente</div>
+          <div class="inst-desc">Antes de fazer o deploy, expanda a seção <strong>"Environment Variables"</strong> e adicione as 3 variáveis abaixo:</div>
+          <div class="mockup" style="margin-top:12px">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><div class="mockup-dot" style="background:#ef4444"></div><div class="mockup-dot" style="background:#f59e0b"></div><div class="mockup-dot" style="background:#10b981"></div></div>
+              <div class="mockup-url">vercel.com/new → Configure Project</div>
+            </div>
+            <div class="mockup-body">
+              <div style="font-size:14px;font-weight:600;margin-bottom:12px">▼ Environment Variables <span class="pulse-ring" style="margin-left:6px"></span></div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="background:var(--bg);border:1px solid var(--green);border-radius:8px;padding:12px">
+                  <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+                    <div style="flex:1;min-width:160px">
+                      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">NAME</div>
+                      <div style="font-family:'DM Mono',monospace;font-size:13px;color:#93c5fd">GROQ_API_KEY</div>
+                    </div>
+                    <div style="flex:2;min-width:200px">
+                      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">VALUE</div>
+                      <div style="font-family:'DM Mono',monospace;font-size:12px;color:#34d399">gsk_sua_chave_do_groq_aqui</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="background:var(--bg);border:1px solid var(--green);border-radius:8px;padding:12px">
+                  <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+                    <div style="flex:1;min-width:160px">
+                      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">NAME</div>
+                      <div style="font-family:'DM Mono',monospace;font-size:13px;color:#93c5fd">SUPABASE_URL</div>
+                    </div>
+                    <div style="flex:2;min-width:200px">
+                      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">VALUE</div>
+                      <div style="font-family:'DM Mono',monospace;font-size:12px;color:#34d399">https://xxxxx.supabase.co</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="background:var(--bg);border:1px solid var(--green);border-radius:8px;padding:12px">
+                  <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+                    <div style="flex:1;min-width:160px">
+                      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">NAME</div>
+                      <div style="font-family:'DM Mono',monospace;font-size:13px;color:#93c5fd">SUPABASE_SERVICE_KEY</div>
+                    </div>
+                    <div style="flex:2;min-width:200px">
+                      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">VALUE</div>
+                      <div style="font-family:'DM Mono',monospace;font-size:12px;color:#34d399">eyJhbGci... (service role key)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:16px;display:flex;justify-content:flex-end">
+                <div class="fake-btn green">Deploy →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="inst-num">4</div>
+        <div class="inst-body">
+          <div class="inst-title">Aguarde o deploy (1-2 minutos)</div>
+          <div class="inst-desc">O Vercel vai mostrar uma animação de build. Quando aparecer confetes 🎉, seu site está no ar!</div>
+          <div class="highlight success" style="margin-top:12px">
+            <div class="highlight-icon">🎉</div>
+            <div class="highlight-text"><strong>URL gerada automaticamente:</strong> algo como <code style="background:var(--surface2);padding:2px 6px;border-radius:4px">linguaai-seuusuario.vercel.app</code></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STEP 6 – FINAL ═══ -->
+  <section class="step-section" id="step6">
+    <div class="final-card">
+      <div style="font-size:48px;margin-bottom:12px">🚀</div>
+      <div class="final-title">Seu LinguaAI está no ar!</div>
+      <div class="final-sub">Compartilhe o link com qualquer pessoa no mundo — sem custo</div>
+
+      <div class="limits-grid">
+        <div class="limit-card">
+          <div class="limit-num">14.400</div>
+          <div class="limit-label">mensagens/dia no Groq (grátis)</div>
+        </div>
+        <div class="limit-card">
+          <div class="limit-num">50.000</div>
+          <div class="limit-label">usuários no Supabase (grátis)</div>
+        </div>
+        <div class="limit-card">
+          <div class="limit-num">100GB</div>
+          <div class="limit-label">de tráfego/mês no Vercel (grátis)</div>
+        </div>
+      </div>
+
+      <div class="highlight tip" style="margin-top:24px;text-align:left">
+        <div class="highlight-icon">💡</div>
+        <div class="highlight-text">
+          <strong>Problema com build?</strong> Vá em Vercel → seu projeto → Settings → Environment Variables → confirme que as 3 variáveis estão corretas → Deployments → Redeploy.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
