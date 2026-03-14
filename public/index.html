@@ -395,6 +395,10 @@ button,input,textarea,select{font-family:'Outfit',sans-serif;}
 /* Toast */
 .toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(18px);background:#1a1f36;color:#fff;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* Translate button — universal */
+.tr-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer;color:var(--muted);flex-shrink:0;transition:all .15s;line-height:1;}
+.tr-btn:hover{background:#eef0ff;border-color:var(--accent);color:var(--accent);}
+.tr-result{display:none;font-size:11px;color:var(--muted);font-style:italic;padding:4px 8px;background:var(--s2);border-radius:8px;margin-top:4px;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .fi{animation:fadeIn .3s ease;}
 @media(max-width:420px){.auth-box{margin:0 10px;padding:26px 18px;}.quiz-opts{grid-template-columns:1fr;}}
@@ -441,9 +445,14 @@ button,input,textarea,select{font-family:'Outfit',sans-serif;}
 <!-- ═══════ TEST ═══════ -->
 <div id="scr-test" class="screen hidden">
   <div class="test-wrap fi">
-    <div style="font-size:21px;font-weight:800;margin-bottom:2px">Teste de Nivelamento 🎯</div>
-    <div style="color:var(--muted);font-size:13px" id="testLangTxt">Descobrindo seu nível...</div>
-    <div class="test-prog-bar"><div class="tpf" id="testProg" style="width:0%"></div></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px">
+      <div style="font-size:21px;font-weight:800" id="testTitle">Teste de Nivelamento</div>
+    </div>
+    <div style="color:var(--muted);font-size:13px" id="testLangTxt">Vamos descobrir seu nível...</div>
+    <div style="display:flex;align-items:center;gap:8px;margin:10px 0 4px">
+      <div class="test-prog-bar" style="flex:1;margin:0"><div class="tpf" id="testProg" style="width:0%"></div></div>
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap" id="testCounter">0 / 0</div>
+    </div>
     <div id="testContent"></div>
   </div>
 </div>
@@ -452,9 +461,10 @@ button,input,textarea,select{font-family:'Outfit',sans-serif;}
 <div id="scr-ob" class="screen hidden">
   <div class="ob-wrap fi">
     <div class="ob-prog" id="obProg"></div>
+    <!-- STEP 1: Language + Age -->
     <div id="ob1">
       <div class="ob-h">Bem-vindo ao LinguaAI! 👋</div>
-      <div class="ob-s">Vamos personalizar sua jornada de aprendizado.</div>
+      <div class="ob-s">Vamos personalizar sua jornada. Isso leva 2 minutos.</div>
       <div class="ob-lbl">Idiomas que quero aprender</div>
       <div class="chips" id="c-lang">
         <span class="chip" data-v="en">🇺🇸 Inglês</span><span class="chip" data-v="es">🇪🇸 Espanhol</span>
@@ -466,50 +476,142 @@ button,input,textarea,select{font-family:'Outfit',sans-serif;}
         <span class="chip" data-v="teen">13–17</span><span class="chip" data-v="young">18–25</span>
         <span class="chip" data-v="adult">26–40</span><span class="chip" data-v="mature">40+</span>
       </div>
+      <div class="ob-lbl">Nível atual (sua estimativa)</div>
+      <div class="chips" id="c-selfLevel">
+        <span class="chip" data-v="0">🆕 Nunca estudei</span>
+        <span class="chip" data-v="1">🔤 Sei o básico</span>
+        <span class="chip" data-v="2">💬 Consigo me comunicar</span>
+        <span class="chip" data-v="3">📚 Intermediário</span>
+        <span class="chip" data-v="4">🎓 Avançado</span>
+      </div>
       <div class="ob-nav"><button class="btn-next" onclick="obGo(2)">Próximo →</button></div>
     </div>
+    <!-- STEP 2: Goals + Context -->
     <div id="ob2" style="display:none">
-      <div class="ob-h">Por que você estuda? 🎯</div>
+      <div class="ob-h">Por que você quer aprender? 🎯</div>
       <div class="chips" id="c-reasons">
-        <span class="chip" data-v="travel">✈️ Viagens</span><span class="chip" data-v="work">💼 Trabalho</span>
-        <span class="chip" data-v="immigration">🌍 Imigração</span><span class="chip" data-v="study">📚 Estudos</span>
-        <span class="chip" data-v="culture">🎭 Cultura</span><span class="chip" data-v="exam">📝 TOEFL/IELTS</span>
+        <span class="chip" data-v="travel">✈️ Viajar</span>
+        <span class="chip" data-v="work">💼 Trabalho / Carreira</span>
+        <span class="chip" data-v="immigration">🌍 Morar no exterior</span>
+        <span class="chip" data-v="study">📚 Estudar fora</span>
+        <span class="chip" data-v="culture">🎭 Cultura e entretenimento</span>
+        <span class="chip" data-v="exam">📝 Exame (TOEFL/IELTS/DELF)</span>
+        <span class="chip" data-v="relationship">💑 Relacionamento / Família</span>
+        <span class="chip" data-v="business">🤝 Negócios internacionais</span>
+        <span class="chip" data-v="hobby">🎮 Hobby / Curiosidade</span>
       </div>
-      <div class="ob-lbl">Profissão (opcional)</div>
-      <input class="ob-inp" id="ob-prof" placeholder="Ex: Engenheiro, Designer, Estudante...">
+      <div class="ob-lbl">Profissão</div>
+      <input class="ob-inp" id="ob-prof" placeholder="Ex: Engenheiro, Médico, Designer, Estudante...">
+      <div class="ob-lbl">Objetivo específico (opcional)</div>
+      <input class="ob-inp" id="ob-goals" placeholder="Ex: Entrevista de emprego, TOEFL 90+, morar em Lisboa...">
       <div class="ob-nav"><button class="btn-back" onclick="obGo(1)">← Voltar</button><button class="btn-next" onclick="obGo(3)">Próximo →</button></div>
     </div>
+    <!-- STEP 3: Study habits -->
     <div id="ob3" style="display:none">
+      <div class="ob-h">Seus hábitos de estudo ⏰</div>
+      <div class="ob-lbl">Quanto tempo por dia você pode dedicar?</div>
+      <div class="chips" id="c-dailyTime">
+        <span class="chip" data-v="5min">⚡ 5 min</span>
+        <span class="chip" data-v="15min">🕐 15 min</span>
+        <span class="chip" data-v="30min">📖 30 min</span>
+        <span class="chip" data-v="1h">🔥 1 hora</span>
+        <span class="chip" data-v="more">💪 Mais de 1 hora</span>
+      </div>
+      <div class="ob-lbl">Qual horário você prefere estudar?</div>
+      <div class="chips" id="c-studyTime">
+        <span class="chip" data-v="morning">🌅 Manhã</span>
+        <span class="chip" data-v="afternoon">☀️ Tarde</span>
+        <span class="chip" data-v="evening">🌙 Noite</span>
+        <span class="chip" data-v="commute">🚌 No trajeto</span>
+        <span class="chip" data-v="anytime">🕐 Qualquer hora</span>
+      </div>
+      <div class="ob-lbl">Maior dificuldade no idioma</div>
+      <div class="chips" id="c-difficulty">
+        <span class="chip" data-v="speaking">🎙️ Falar / Pronúncia</span>
+        <span class="chip" data-v="listening">👂 Entender quando falam</span>
+        <span class="chip" data-v="grammar">📐 Gramática</span>
+        <span class="chip" data-v="vocab">📖 Vocabulário</span>
+        <span class="chip" data-v="writing">✍️ Escrita</span>
+        <span class="chip" data-v="all">😅 Tudo!</span>
+      </div>
+      <div class="ob-nav"><button class="btn-back" onclick="obGo(2)">← Voltar</button><button class="btn-next" onclick="obGo(4)">Próximo →</button></div>
+    </div>
+    <!-- STEP 4: Interests (expanded) -->
+    <div id="ob4" style="display:none">
       <div class="ob-h">Seus interesses 🎨</div>
-      <div class="ob-lbl">Esportes favoritos</div>
+      <div class="ob-s">Usamos isso para criar conteúdo personalizado pra você.</div>
+      <div class="ob-lbl">Esportes</div>
       <div class="chips" id="c-sports">
         <span class="chip" data-v="football">⚽ Futebol</span><span class="chip" data-v="basketball">🏀 Basquete</span>
-        <span class="chip" data-v="esports">🎮 E-sports</span><span class="chip" data-v="mma">🥊 Lutas</span>
+        <span class="chip" data-v="esports">🎮 E-sports</span><span class="chip" data-v="mma">🥊 Lutas / MMA</span>
         <span class="chip" data-v="tennis">🎾 Tênis</span><span class="chip" data-v="f1">🏎️ F1</span>
+        <span class="chip" data-v="volleyball">🏐 Vôlei</span><span class="chip" data-v="swimming">🏊 Natação</span>
+        <span class="chip" data-v="running">🏃 Corrida</span>
       </div>
       <div class="ob-lbl">Entretenimento</div>
       <div class="chips" id="c-movies">
         <span class="chip" data-v="action">💥 Ação</span><span class="chip" data-v="comedy">😂 Comédia</span>
         <span class="chip" data-v="scifi">🚀 Sci-Fi</span><span class="chip" data-v="anime">🍜 Anime</span>
         <span class="chip" data-v="music">🎵 Música</span><span class="chip" data-v="series">📺 Séries</span>
+        <span class="chip" data-v="documentary">🎬 Documentário</span><span class="chip" data-v="gaming">🎮 Games</span>
+        <span class="chip" data-v="books">📚 Livros</span>
       </div>
-      <div class="ob-nav"><button class="btn-back" onclick="obGo(2)">← Voltar</button><button class="btn-next" onclick="obGo(4)">Próximo →</button></div>
+      <div class="ob-lbl">Outros interesses</div>
+      <div class="chips" id="c-hobbies">
+        <span class="chip" data-v="cooking">🍳 Culinária</span>
+        <span class="chip" data-v="travel">✈️ Viagens</span>
+        <span class="chip" data-v="tech">💻 Tecnologia</span>
+        <span class="chip" data-v="fashion">👗 Moda</span>
+        <span class="chip" data-v="nature">🌿 Natureza</span>
+        <span class="chip" data-v="art">🎨 Arte</span>
+        <span class="chip" data-v="finance">💰 Finanças</span>
+        <span class="chip" data-v="health">🏋️ Saúde / Fitness</span>
+      </div>
+      <div class="ob-nav"><button class="btn-back" onclick="obGo(3)">← Voltar</button><button class="btn-next" onclick="obGo(5)">Próximo →</button></div>
     </div>
-    <div id="ob4" style="display:none">
+    <!-- STEP 5: Teacher preference -->
+    <div id="ob5" style="display:none">
       <div class="ob-h">Seu professor ideal 🧑‍🏫</div>
       <div class="ob-lbl">Gênero preferido</div>
       <div class="chips" id="c-gender">
         <span class="chip" data-v="female">👩 Professora</span><span class="chip" data-v="male">👨 Professor</span>
       </div>
-      <div class="ob-lbl">Personalidade</div>
+      <div class="ob-lbl">Personalidade do professor</div>
       <div class="chips" id="c-pers">
-        <span class="chip" data-v="friendly">😊 Descontraído</span><span class="chip" data-v="formal">👔 Formal</span>
-        <span class="chip" data-v="energetic">⚡ Energético</span><span class="chip" data-v="patient">🌿 Paciente</span>
+        <span class="chip" data-v="friendly">😊 Descontraído e amigável</span>
+        <span class="chip" data-v="formal">👔 Formal e profissional</span>
+        <span class="chip" data-v="energetic">⚡ Energético e motivador</span>
+        <span class="chip" data-v="patient">🌿 Calmo e paciente</span>
         <span class="chip" data-v="funny">😄 Bem-humorado</span>
       </div>
-      <div class="ob-lbl">Objetivos (opcional)</div>
-      <input class="ob-inp" id="ob-goals" placeholder="Ex: TOEFL, entrevista, morar no exterior...">
-      <div class="ob-nav"><button class="btn-back" onclick="obGo(3)">← Voltar</button><button class="btn-next" id="btn-ob-finish" onclick="obFinish()">Começar! 🚀</button></div>
+      <div class="ob-lbl">Como você prefere aprender?</div>
+      <div class="chips" id="c-learnStyle">
+        <span class="chip" data-v="conversation">💬 Conversando (falar bastante)</span>
+        <span class="chip" data-v="structured">📋 Aulas estruturadas</span>
+        <span class="chip" data-v="games">🎮 Jogos e desafios</span>
+        <span class="chip" data-v="immersion">🌊 Imersão total no idioma</span>
+        <span class="chip" data-v="mixed">🔀 Mistura de tudo</span>
+      </div>
+      <div class="ob-nav"><button class="btn-back" onclick="obGo(4)">← Voltar</button><button class="btn-next" onclick="obGo(6)">Próximo →</button></div>
+    </div>
+    <!-- STEP 6: Quick spoken sentence (voice or text) -->
+    <div id="ob6" style="display:none">
+      <div class="ob-h">Quase lá! 🚀</div>
+      <div class="ob-s">Como prefere ser chamado e tem mais alguma coisa que devemos saber?</div>
+      <div class="ob-lbl">Como quer ser chamado pelo professor?</div>
+      <input class="ob-inp" id="ob-nickname" placeholder="Ex: João, Ju, Cara...">
+      <div class="ob-lbl">Experiências passadas com o idioma</div>
+      <div class="chips" id="c-prevExp">
+        <span class="chip" data-v="school">🏫 Estudei na escola</span>
+        <span class="chip" data-v="course">📖 Fiz curso de idiomas</span>
+        <span class="chip" data-v="app">📱 Usei apps (Duolingo, etc)</span>
+        <span class="chip" data-v="lived">🌍 Morei no exterior</span>
+        <span class="chip" data-v="work">💼 Usei no trabalho</span>
+        <span class="chip" data-v="none">🆕 Nunca estudei formalmente</span>
+      </div>
+      <div class="ob-lbl">Algo mais que o professor deve saber? (opcional)</div>
+      <textarea class="ob-inp" id="ob-extra" rows="2" placeholder="Ex: Tenho dislexia, aprendo melhor ouvindo, quero focar em sotaque americano..." style="resize:none;height:70px"></textarea>
+      <div class="ob-nav"><button class="btn-back" onclick="obGo(5)">← Voltar</button><button class="btn-next" id="btn-ob-finish" onclick="obFinish()">Começar! 🚀</button></div>
     </div>
   </div>
 </div>
@@ -1183,28 +1285,70 @@ function switchAuth(t){
 async function doLogin(){
   const e=V('le'),p=V('lp'),m=document.getElementById('lmsg');
   if(!e||!p){showMsg(m,'Preencha todos os campos','err');return;}
-  document.getElementById('btn-login').disabled=true;showMsg(m,'Entrando...','');
-  const{data,error}=await sb.auth.signInWithPassword({email:e,password:p});
-  document.getElementById('btn-login').disabled=false;
-  if(error){showMsg(m,'E-mail ou senha incorretos','err');return;}
-  S.user=data.user;S.token=data.session.access_token;
-  await loadProfile();
+  const btn=document.getElementById('btn-login');
+  btn.disabled=true;showMsg(m,'Entrando...','');
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email:e,password:p});
+    btn.disabled=false;
+    if(error){
+      // Provide helpful error messages
+      const errMap={
+        'Invalid login credentials':'E-mail ou senha incorretos.',
+        'Email not confirmed':'Confirme seu e-mail antes de entrar.',
+        'Too many requests':'Muitas tentativas. Aguarde alguns minutos.',
+      };
+      const msg=Object.entries(errMap).find(([k])=>error.message.includes(k))?.[1]||'Erro: '+error.message;
+      showMsg(m,msg,'err');return;
+    }
+    if(!data.session){showMsg(m,'Sessão não iniciada. Tente novamente.','err');return;}
+    S.user=data.user;S.token=data.session.access_token;
+    // Persist session in localStorage as fallback
+    try{localStorage.setItem('lingua_email',e);}catch{}
+    await loadProfile();
+  }catch(ex){
+    btn.disabled=false;
+    showMsg(m,'Erro de conexão. Verifique sua internet.','err');
+  }
 }
+
 async function doReg(){
   const n=V('rn'),e=V('re'),p=V('rp'),m=document.getElementById('rmsg');
   if(!n||!e||!p){showMsg(m,'Preencha todos os campos','err');return;}
   if(p.length<6){showMsg(m,'Senha mínima: 6 caracteres','err');return;}
-  document.getElementById('btn-reg').disabled=true;showMsg(m,'Criando...','');
-  const{data,error}=await sb.auth.signUp({email:e,password:p,options:{data:{name:n}}});
-  document.getElementById('btn-reg').disabled=false;
-  if(error){showMsg(m,error.message,'err');return;}
-  if(data.user){S.user=data.user;S.token=data.session?.access_token;S.profile={name:n};showOB();}
-  else showMsg(m,'Confirme seu e-mail e faça login!','ok');
+  const btn=document.getElementById('btn-reg');
+  btn.disabled=true;showMsg(m,'Criando conta...','');
+  try{
+    const{data,error}=await sb.auth.signUp({email:e,password:p,options:{data:{name:n}}});
+    btn.disabled=false;
+    if(error){showMsg(m,error.message,'err');return;}
+    if(data.user&&data.session){
+      // Session exists = email confirmation OFF, log in directly
+      S.user=data.user;S.token=data.session.access_token;
+      S.profile={name:n};
+      try{localStorage.setItem('lingua_email',e);}catch{}
+      showOB();
+    }else if(data.user){
+      // Email confirmation ON — auto-attempt login anyway after small delay
+      showMsg(m,'Conta criada! Fazendo login...','ok');
+      setTimeout(async()=>{
+        const{data:d2,error:e2}=await sb.auth.signInWithPassword({email:e,password:p});
+        if(!e2&&d2.session){S.user=d2.user;S.token=d2.session.access_token;S.profile={name:n};showOB();}
+        else showMsg(m,'Conta criada! Faça login com seu e-mail.','ok');
+      },1500);
+    }
+  }catch(ex){
+    btn.disabled=false;showMsg(m,'Erro de conexão.','err');
+  }
 }
+
 async function doLogout(){
-  await sb.auth.signOut();Object.assign(S,{user:null,token:null,msgs:[]});
+  try{await sb.auth.signOut();}catch{}
+  Object.assign(S,{user:null,token:null,msgs:[]});
   stopMic();stopTimer();showScr('auth');
+  // Pre-fill email if saved
+  try{const saved=localStorage.getItem('lingua_email');if(saved)document.getElementById('le').value=saved;}catch{}
 }
+
 async function loadProfile(){
   try{
     const r=await fetch(API+'/api/profile',{headers:{Authorization:'Bearer '+S.token}});
@@ -1215,8 +1359,15 @@ async function loadProfile(){
         streak:p.streak||0,gameStats:p.gameStats||{played:0,correct:0,bestStreak:0,score:0},
         lessonCount:p.lessonCount||0,convCount:p.convCount||0,exerciseScore:p.exerciseScore||0});
       initApp();
-    }else{S.profile={name:S.user.user_metadata?.name||'Aluno'};showOB();}
-  }catch{S.profile={name:S.user.user_metadata?.name||'Aluno'};showOB();}
+    }else{
+      // Profile not found — new user or first login
+      S.profile={name:S.user.user_metadata?.name||S.user.email?.split('@')[0]||'Aluno'};
+      showOB();
+    }
+  }catch(ex){
+    S.profile={name:S.user.user_metadata?.name||'Aluno'};
+    showOB();
+  }
 }
 async function saveProfile(){
   if(!S.token)return;
@@ -1228,86 +1379,226 @@ async function saveProfile(){
 }
 
 // ════════════════════════════════════════
-//  PLACEMENT TEST
+//  PLACEMENT TEST — Rich multi-type
 // ════════════════════════════════════════
-const TEST_QS={
-  en:[
-    {q:'Correct sentence:',opts:['I am go school','I goes to school','I go to school','I going school'],a:'I go to school'},
-    {q:'She ___ worked here for 5 years.',opts:['have','has','is','was'],a:'has'},
-    {q:'Past Perfect correct:',opts:['I had eat','I had eaten before he arrived','I eated it','I have eat'],a:'I had eaten before he arrived'},
-    {q:'"Break the ice" means:',opts:['Destroy ice','Make people comfortable','End relationship','Start fight'],a:'Make people comfortable'},
-    {q:'Subjunctive: I wish she ___ here.',opts:['is','was','were','be'],a:'were'},
-  ],
-  es:[
-    {q:'Oración correcta:',opts:['Yo soy va','Yo voy al mercado','Yo veo ir','Yo ir mercado'],a:'Yo voy al mercado'},
-    {q:'Ayer _____ al gimnasio.',opts:['voy','vaya','fui','iré'],a:'fui'},
-    {q:'Subjuntivo correcto:',opts:['Espero que vengas','Espero que vienes','Espero venir','Espero vendrás'],a:'Espero que vengas'},
-    {q:'"Costar un ojo de la cara" significa:',opts:['Dolor de ojo','Ser muy caro','Ver bien','Nada'],a:'Ser muy caro'},
-    {q:'Ser vs Estar — La sopa ___ caliente.',opts:['es','estar','está','son'],a:'está'},
-  ],
-  fr:[
-    {q:'Phrase correcte:',opts:['Je suis aller','Je vais à l\'école','Je vas','J\'aller'],a:'Je vais à l\'école'},
-    {q:'Elle ___ travaillé ici 5 ans.',opts:['a','est','ont','être'],a:'a'},
-    {q:'Subjonctif correct:',opts:['que tu viens','que tu viennes','que tu vient','que tu venez'],a:'que tu viennes'},
-    {q:'"Il pleut des cordes" signifie:',opts:['Chaleur','Très forte pluie','Cordes qui tombent','Peu de pluie'],a:'Très forte pluie'},
-    {q:'Plus-que-parfait: Il ___ déjà mangé.',opts:['avait','a','avais','aura'],a:'avait'},
-  ],
+const TEST_BANKS={
+  en:{name:'English',questions:[
+    {type:'mc',q:'Choose the correct sentence:',opts:['I am go to school','I goes to school','I go to school','I going to school'],a:'I go to school',lvl:0},
+    {type:'img',q:'What is this? 🐶',opts:['A cat','A dog','A bird','A fish'],a:'A dog',lvl:0},
+    {type:'img',q:'What color is this? 🔴',opts:['Blue','Green','Red','Yellow'],a:'Red',lvl:0},
+    {type:'fill',q:'She ___ working here for 3 years. (present perfect)',a:'has been',hint:'has been / have been',lvl:1},
+    {type:'translate',q:'How do you say "Eu tenho fome" in English?',a:'I am hungry',hint:'I am...',lvl:1},
+    {type:'mc',q:'What does "under the weather" mean?',opts:['It is raining','Feeling sick','Outside','Happy'],a:'Feeling sick',lvl:1},
+    {type:'fill',q:'If I ___ rich, I would travel the world. (conditional)',a:'were',hint:'was / were',lvl:2},
+    {type:'img',q:'Which emoji shows surprise?',opts:['😴','😤','😲','😎'],a:'😲',lvl:2},
+    {type:'mc',q:'"It\'s raining cats and dogs" means:',opts:['Animals are falling','It\'s raining heavily','Light drizzle','It\'s sunny'],a:'It\'s raining heavily',lvl:3},
+    {type:'fill',q:'By the time she arrived, I ___ already eaten. (past perfect)',a:'had',hint:'had / have',lvl:3},
+    {type:'mc',q:'Which is more formal?',opts:['Wanna grab lunch?','Could we schedule lunch?','Lets eat','Lunch time!'],a:'Could we schedule lunch?',lvl:4},
+    {type:'speak',q:'Write this sentence in English:',prompt:'"Estou aprendendo inglês há dois anos"',hint:'I have been learning English for two years.',lvl:2},
+  ]},
+  es:{name:'Español',questions:[
+    {type:'mc',q:'Elige la oración correcta:',opts:['Yo soy va','Yo voy al mercado','Yo veo ir','Yo ir mercado'],a:'Yo voy al mercado',lvl:0},
+    {type:'img',q:'¿Qué es esto? 🍎',opts:['Una naranja','Una manzana','Un limón','Una pera'],a:'Una manzana',lvl:0},
+    {type:'img',q:'¿Qué color es? 🟦',opts:['Rojo','Verde','Azul','Amarillo'],a:'Azul',lvl:0},
+    {type:'fill',q:'Ayer _____ al gimnasio. (pretérito)',a:'fui',hint:'fui / fue',lvl:1},
+    {type:'translate',q:'¿Cómo se dice "Tenho saudade" en español?',a:'Te extraño',hint:'Te extraño',lvl:1},
+    {type:'mc',q:'"Costar un ojo de la cara" significa:',opts:['Dolor de ojo','Ser muy caro','Ver bien','Nada especial'],a:'Ser muy caro',lvl:2},
+    {type:'fill',q:'Espero que tú _____ mañana. (subjuntivo)',a:'vengas',hint:'vengas / vienes',lvl:2},
+    {type:'speak',q:'Escribe esta frase en español:',prompt:'"Preciso de ajuda, por favor"',hint:'Necesito ayuda, por favor.',lvl:1},
+  ]},
+  fr:{name:'Français',questions:[
+    {type:'mc',q:'Choisissez la phrase correcte:',opts:['Je suis aller','Je vais à l\'école','Je vas','J\'aller'],a:'Je vais à l\'école',lvl:0},
+    {type:'img',q:'Qu\'est-ce que c\'est? 🐱',opts:['Un chien','Un chat','Un oiseau','Un lapin'],a:'Un chat',lvl:0},
+    {type:'fill',q:'Elle ___ travaillé ici 5 ans. (passé composé)',a:'a',hint:'a / est',lvl:1},
+    {type:'translate',q:'Comment dit-on "Bom dia" en français?',a:'Bonjour',hint:'Bon...',lvl:0},
+    {type:'mc',q:'"Il pleut des cordes" signifie:',opts:['Il fait soleil','Il pleut très fort','Il neige','Il fait chaud'],a:'Il pleut très fort',lvl:2},
+    {type:'fill',q:'Je veux que tu _____ avec moi. (subjonctif)',a:'viennes',hint:'viennes / viens',lvl:3},
+    {type:'speak',q:'Écris cette phrase en français:',prompt:'"Eu não falo francês muito bem ainda"',hint:'Je ne parle pas très bien français encore.',lvl:1},
+  ]},
+  de:{name:'Deutsch',questions:[
+    {type:'mc',q:'Wähle den richtigen Satz:',opts:['Ich bin gehen','Ich gehe zur Schule','Ich gehen Schule','Ich gehst'],a:'Ich gehe zur Schule',lvl:0},
+    {type:'img',q:'Was ist das? 🏠',opts:['Ein Auto','Eine Schule','Ein Haus','Ein Baum'],a:'Ein Haus',lvl:0},
+    {type:'fill',q:'Er ___ gestern ins Kino gegangen. (Perfekt)',a:'ist',hint:'ist / hat',lvl:1},
+    {type:'speak',q:'Schreib diesen Satz auf Deutsch:',prompt:'"Onde fica o banheiro?"',hint:'Wo ist die Toilette?',lvl:0},
+  ]},
+  ja:{name:'日本語',questions:[
+    {type:'mc',q:'正しい文はどれですか？',opts:['私は学校います','私は学校に行きます','私学校行く','私は行くの'],a:'私は学校に行きます',lvl:0},
+    {type:'img',q:'これは何ですか？ 🌸',opts:['ゆき（雪）','はな（花）','かわ（川）','やま（山）'],a:'はな（花）',lvl:0},
+    {type:'speak',q:'この文を日本語で書いてください:',prompt:'"Obrigado pela ajuda"',hint:'ありがとうございます',lvl:0},
+  ]},
+  it:{name:'Italiano',questions:[
+    {type:'mc',q:'Scegli la frase corretta:',opts:['Io sono andare','Io vado a scuola','Io vanno scuola','Io vai'],a:'Io vado a scuola',lvl:0},
+    {type:'img',q:'Che cos\'è? 🍕',opts:['Una pasta','Una pizza','Un risotto','Un gelato'],a:'Una pizza',lvl:0},
+    {type:'fill',q:'Ieri ___ al cinema. (passato prossimo)',a:'sono andato',hint:'sono andato / ho andato',lvl:1},
+    {type:'speak',q:'Scrivi questa frase in italiano:',prompt:'"Quanto custa isso?"',hint:'Quanto costa?',lvl:0},
+  ]},
 };
-let TS={lang:'en',qi:0,score:0};
-function startTest(lang){TS={lang,qi:0,score:0};setText('testLangTxt','Nível de '+LANGS[lang]?.pt);showScr('test');renderTestQ();}
+
+let TS={lang:'en',qi:0,score:0,answers:[]};
+
+function startTest(lang){
+  TS={lang,qi:0,score:0,answers:[]};
+  const bank=TEST_BANKS[lang]||TEST_BANKS.en;
+  setText('testLangTxt','Vamos descobrir seu nível em '+bank.name);
+  showScr('test');renderTestQ();
+}
+
 function renderTestQ(){
-  const qs=TEST_QS[TS.lang]||TEST_QS.en,q=qs[TS.qi];
+  const bank=TEST_BANKS[TS.lang]||TEST_BANKS.en;
+  const qs=bank.questions;const q=qs[TS.qi];
   if(!q){finishTest();return;}
   document.getElementById('testProg').style.width=Math.round(TS.qi/qs.length*100)+'%';
-  document.getElementById('testContent').innerHTML=`<div class="test-q fi">
-    <div class="test-q-txt">${TS.qi+1}/${qs.length} — ${q.q}</div>
-    ${q.opts.map(o=>`<button class="test-opt" onclick="pickTest(this,'${esc(o)}','${esc(q.a)}')">${o}</button>`).join('')}
-  </div><div style="text-align:right;margin-top:8px"><button style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer" onclick="skipTest()">Pular →</button></div>`;
+  setText('testCounter',(TS.qi+1)+' / '+qs.length);
+  const c=document.getElementById('testContent');if(!c)return;
+  const typeTag=(t)=>({mc:'Múltipla Escolha',img:'Identifique a imagem',fill:'Preencha a lacuna',translate:'Tradução',speak:'Escreva a frase'}[t]||t);
+
+  if(q.type==='mc'||q.type==='img'){
+    const emoji=q.q.match(/[\u{1F300}-\u{1FFFF}]|[\u2600-\u27BF]/gu)?.[0]||'';
+    c.innerHTML=`<div class="test-q fi">
+      ${q.type==='img'?`<div style="font-size:56px;text-align:center;margin-bottom:10px;line-height:1">${emoji}</div>`:''}
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${typeTag(q.type)}</div>
+      <div class="test-q-txt">${q.q}</div>
+      ${q.opts.map(o=>`<button class="test-opt" onclick="pickTest(this,'${esc(o)}','${esc(q.a)}')">${o}</button>`).join('')}
+    </div>
+    <button style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;display:block;margin-top:8px;margin-left:auto" onclick="skipTest()">Não sei →</button>`;
+  }
+  else if(q.type==='fill'||q.type==='translate'){
+    c.innerHTML=`<div class="test-q fi">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${typeTag(q.type)}</div>
+      <div class="test-q-txt">${q.q}</div>
+      <input id="testFill" class="ob-inp" placeholder="Sua resposta..." style="margin-bottom:6px" onkeydown="if(event.key==='Enter')submitFill()">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">💡 Dica: ${q.hint||''}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-next" onclick="submitFill()" style="flex:1">Confirmar →</button>
+        <button onclick="skipTest()" style="background:none;border:1.5px solid var(--border);border-radius:50px;padding:9px 14px;font-size:12px;cursor:pointer;color:var(--muted)">Pular</button>
+      </div>
+    </div>`;
+    setTimeout(()=>document.getElementById('testFill')?.focus(),100);
+  }
+  else if(q.type==='speak'){
+    c.innerHTML=`<div class="test-q fi">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${typeTag(q.type)}</div>
+      <div class="test-q-txt">${q.q}</div>
+      <div style="background:linear-gradient(135deg,var(--s2),var(--s3));border-radius:14px;padding:14px;text-align:center;font-size:15px;font-weight:700;color:var(--accent);margin-bottom:12px">${q.prompt}</div>
+      <textarea id="testFill" class="ob-inp" rows="2" placeholder="Escreva como você diria em ${bank.name}..." style="resize:none;height:62px;margin-bottom:6px"></textarea>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">💡 Modelo: <em>${q.hint||''}</em></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-next" onclick="submitFill()" style="flex:1">Confirmar →</button>
+        <button onclick="skipTest()" style="background:none;border:1.5px solid var(--border);border-radius:50px;padding:9px 14px;font-size:12px;cursor:pointer;color:var(--muted)">Pular</button>
+      </div>
+    </div>`;
+    setTimeout(()=>document.getElementById('testFill')?.focus(),100);
+  }
 }
+
 function pickTest(btn,ans,correct){
   document.querySelectorAll('.test-opt').forEach(b=>b.onclick=null);
   const ok=ans===correct;btn.classList.add(ok?'correct':'wrong');
-  if(ok)TS.score++;else document.querySelectorAll('.test-opt').forEach(b=>{if(b.textContent.trim()===correct)b.classList.add('correct');});
-  setTimeout(()=>{TS.qi++;renderTestQ();},700);
-}
-function skipTest(){TS.qi++;renderTestQ();}
-function finishTest(){
-  const lvl=TS.score<=1?0:TS.score<=2?1:TS.score<=3?2:TS.score===4?3:4;
-  if(!S.langData[TS.lang])S.langData[TS.lang]={level:0,xp:0,msgs:0,vocab:0,grammar:0,fluency:0,history:[],totalLessons:0,totalExScore:0,totalConvs:0};
-  S.langData[TS.lang].level=lvl;S.lang=TS.lang;
-  if(!S.profile.obDone)showOB();else{saveProfile();initApp();}
+  if(ok)TS.score++;
+  else document.querySelectorAll('.test-opt').forEach(b=>{if(b.textContent.trim()===correct)b.classList.add('correct');});
+  TS.answers.push({qi:TS.qi,ok});
+  setTimeout(()=>{TS.qi++;renderTestQ();},800);
 }
 
+function submitFill(){
+  const bank=TEST_BANKS[TS.lang]||TEST_BANKS.en;
+  const q=bank.questions[TS.qi];
+  const ua=(document.getElementById('testFill')?.value||'').trim().toLowerCase();
+  const ca=(q.a||'').toLowerCase();
+  const ok=ua===ca||ua.includes(ca)||ca.includes(ua)||(ua.length>2&&ca.split(' ').some(w=>ua.includes(w)));
+  const fill=document.getElementById('testFill');
+  if(fill){fill.disabled=true;fill.style.borderColor=ok?'var(--green)':'var(--red)';}
+  const res=document.createElement('div');
+  res.style.cssText=`margin-top:7px;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;background:${ok?'#edfff8':'#fff0f3'};color:${ok?'#059669':'var(--red)'};border:1px solid ${ok?'#a7f3d0':'#fecdd3'}`;
+  res.textContent=ok?'✅ Correto!':'❌ Resposta: '+q.a;
+  fill?.parentNode?.appendChild(res);
+  if(ok)TS.score++;
+  TS.answers.push({qi:TS.qi,ok});
+  setTimeout(()=>{TS.qi++;renderTestQ();},1100);
+}
+
+function skipTest(){TS.answers.push({qi:TS.qi,ok:false});TS.qi++;renderTestQ();}
+
+function finishTest(){
+  const bank=TEST_BANKS[TS.lang]||TEST_BANKS.en;
+  const total=bank.questions.length;
+  const pct=total?TS.score/total:0;
+  const lvl=pct<0.18?0:pct<0.38?1:pct<0.58?2:pct<0.78?3:4;
+  if(!S.langData[TS.lang])S.langData[TS.lang]={level:0,xp:0,msgs:0,vocab:0,grammar:0,fluency:0,history:[],totalLessons:0,totalExScore:0,totalConvs:0};
+  S.langData[TS.lang].level=lvl;S.lang=TS.lang;
+  const c=document.getElementById('testContent');
+  if(c){
+    const lvlNames=['Iniciante (A1)','Básico (A2)','Intermediário (B1)','Avançado (B2)','Fluente (C1+)'];
+    c.innerHTML=`<div style="text-align:center;padding:20px 0">
+      <div style="font-size:52px;margin-bottom:8px">${['🌱','🌿','🌳','🏆','👑'][lvl]}</div>
+      <div style="font-size:20px;font-weight:800;color:var(--accent)">${lvlNames[lvl]}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:5px">${TS.score}/${total} acertos</div>
+      <div style="font-size:13px;margin-top:10px;color:var(--txt2)">Perfeito! Vamos personalizar suas aulas. 🚀</div>
+    </div>`;
+    document.getElementById('testProg').style.width='100%';
+  }
+  setTimeout(()=>{if(!S.profile.obDone)showOB();else{saveProfile();initApp();}},2000);
+}
 // ════════════════════════════════════════
 //  ONBOARDING
 // ════════════════════════════════════════
 function showOB(){showScr('ob');renderObProg(1);setupChips();}
-function renderObProg(s){document.getElementById('obProg').innerHTML=[1,2,3,4].map(i=>`<div class="ob-dot${i<=s?' done':''}"></div>`).join('');}
+function renderObProg(s){document.getElementById('obProg').innerHTML=[1,2,3,4,5,6].map(i=>`<div class="ob-dot${i<=s?' done':''}"></div>`).join('');}
 function setupChips(){
-  const multi=['lang','reasons','sports','movies'];
-  const single=['age','gender','pers'];
+  const multi=['lang','reasons','sports','movies','hobbies','difficulty','prevExp'];
+  const single=['age','gender','pers','selfLevel','dailyTime','studyTime','learnStyle'];
   [...multi,...single].forEach(id=>{
     document.querySelectorAll(`#c-${id} .chip`).forEach(c=>{
       c.onclick=()=>{
         const v=c.dataset.v;
         if(single.includes(id)){
-          document.querySelectorAll(`#c-${id} .chip`).forEach(x=>x.classList.remove('on'));c.classList.add('on');
-          if(id==='age')OB.age=v;if(id==='gender'){OB.gender=v;S.gender=v;}if(id==='pers'){OB.pers=v;S.pers=v;}
-        }else{const k=id==='lang'?'langs':id;const a=OB[k];const i=a.indexOf(v);i>-1?a.splice(i,1):a.push(v);c.classList.toggle('on');}
+          document.querySelectorAll(`#c-${id} .chip`).forEach(x=>x.classList.remove('on'));
+          c.classList.add('on');
+          if(id==='age')OB.age=v;
+          if(id==='gender'){OB.gender=v;S.gender=v;}
+          if(id==='pers'){OB.pers=v;S.pers=v;}
+          if(id==='selfLevel')OB.selfLevel=v;
+          if(id==='dailyTime')OB.dailyTime=v;
+          if(id==='studyTime')OB.studyTime=v;
+          if(id==='learnStyle')OB.learnStyle=v;
+        }else{
+          const keyMap={lang:'langs',hobbies:'hobbies',difficulty:'difficulty',prevExp:'prevExp'};
+          const k=keyMap[id]||id;
+          if(!OB[k])OB[k]=[];
+          const i=OB[k].indexOf(v);i>-1?OB[k].splice(i,1):OB[k].push(v);
+          c.classList.toggle('on');
+        }
       };
     });
   });
 }
-function obGo(n){for(let i=1;i<=4;i++)document.getElementById('ob'+i).style.display=i===n?'block':'none';renderObProg(n);}
+function obGo(n){
+  for(let i=1;i<=6;i++){
+    const el=document.getElementById('ob'+i);
+    if(el)el.style.display=i===n?'block':'none';
+  }
+  renderObProg(n);
+}
 async function obFinish(){
   OB.goals=V('ob-goals');OB.profession=V('ob-prof');
-  document.getElementById('btn-ob-finish').disabled=true;
+  OB.nickname=V('ob-nickname');OB.extra=document.getElementById('ob-extra')?.value?.trim()||'';
+  const btn=document.getElementById('btn-ob-finish');
+  if(btn)btn.disabled=true;
   const langs=OB.langs.length?OB.langs:['en'];
   langs.forEach(l=>{if(!S.langData[l])S.langData[l]={level:0,xp:0,msgs:0,vocab:0,grammar:0,fluency:0,history:[],totalLessons:0,totalExScore:0,totalConvs:0};});
   S.lang=langs[0];
-  Object.assign(S.profile,{age:OB.age,reasons:OB.reasons,sports:OB.sports,movies:OB.movies,pers:OB.pers,gender:OB.gender,goals:OB.goals,profession:OB.profession,langs,obDone:true});
-  S.gender=OB.gender;S.pers=OB.pers;
-  await saveProfile();startTest(S.lang);
+  // Use nickname as preferred name if given
+  const displayName=OB.nickname||S.profile.name||'Aluno';
+  Object.assign(S.profile,{
+    name:displayName,age:OB.age,reasons:OB.reasons,sports:OB.sports||[],
+    movies:OB.movies||[],hobbies:OB.hobbies||[],pers:OB.pers,gender:OB.gender,
+    goals:OB.goals,profession:OB.profession,langs,obDone:true,
+    selfLevel:OB.selfLevel,dailyTime:OB.dailyTime,studyTime:OB.studyTime,
+    learnStyle:OB.learnStyle,difficulty:OB.difficulty||[],prevExp:OB.prevExp||[],extra:OB.extra
+  });
+  S.gender=OB.gender||'female';S.pers=OB.pers||'friendly';
+  await saveProfile();
+  startTest(S.lang);
 }
 
 // ════════════════════════════════════════
@@ -1483,26 +1774,43 @@ function extractTopic(text){
 // CHAT UI
 function addCallMsg(who,name,text){
   const ch=document.getElementById('callChat');if(!ch)return;
-  const div=document.createElement('div');
   const mid='cm'+Date.now();
-  div.className='cc-msg cc-'+who;
-  div.innerHTML=`${text} <button class="btn-tr-dark" onclick="translateCallMsg('${mid}','${who}')">🌐</button>`;
-  div.id=mid+'_bubble';
+  const div=document.createElement('div');
+  div.style.cssText=`margin-bottom:5px;display:flex;flex-direction:column;align-items:${who==='ai'?'flex-start':'flex-end'}`;
+  const bubble=document.createElement('div');
+  bubble.className='cc-msg cc-'+who;
+  bubble.id=mid;
+  bubble.textContent=text;
+  const meta=document.createElement('div');
+  meta.style.cssText=`display:flex;align-items:center;gap:4px;margin-top:2px;${who==='ai'?'':'flex-direction:row-reverse'}`;
+  const trBtn=document.createElement('button');
+  trBtn.className='btn-tr-dark';trBtn.textContent='🌐';
+  trBtn.onclick=()=>translateCallMsg(mid,text,trBtn,div);
+  meta.appendChild(trBtn);
+  div.appendChild(bubble);div.appendChild(meta);
   ch.appendChild(div);ch.scrollTop=ch.scrollHeight;
 }
-function showTyping(){const ch=document.getElementById('callChat');if(!ch)return;const d=document.createElement('div');d.className='cc-msg cc-ai';d.id='typingRow';d.innerHTML='<span style="opacity:.6">⋯ digitando</span>';ch.appendChild(d);ch.scrollTop=ch.scrollHeight;}
-function removeTyping(){document.getElementById('typingRow')?.remove();}
-async function translateCallMsg(mid,who){
-  const el=document.getElementById(mid+'_bubble');if(!el)return;
-  const txt=el.firstChild?.textContent?.trim()||'';
-  const btn=el.querySelector('.btn-tr-dark');if(btn)btn.textContent='⏳';
+
+async function translateCallMsg(mid,text,btn,container){
+  const existing=container.querySelector('.cc-tr');
+  if(existing){existing.remove();btn.textContent='🌐';return;}
+  btn.textContent='⏳';btn.disabled=true;
   try{
-    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:`Translate ONLY to Brazilian Portuguese:\n"${txt}"`}],systemPrompt:'Respond ONLY with the translation.',userId:S.user?.id})});
-    const d=await r.json();const tr=(d.reply||'').trim();
-    if(tr){const sp=document.createElement('div');sp.className='cc-tr';sp.textContent='🌐 '+tr;el.parentNode.insertBefore(sp,el.nextSibling);}
+    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:`Translate ONLY to Brazilian Portuguese:\n"${text}"`}],
+        systemPrompt:'Respond ONLY with the Portuguese translation.',userId:S.user?.id})});
+    const d=await r.json();const tr=(d.reply||'').trim().replace(/^["']|["']$/g,'');
+    if(tr){const sp=document.createElement('div');sp.className='cc-tr';sp.textContent='🇧🇷 '+tr;container.appendChild(sp);}
   }catch{}
-  if(btn)btn.textContent='🌐';
+  btn.textContent='🌐';btn.disabled=false;
 }
+function showTyping(){
+  const ch=document.getElementById('callChat');if(!ch)return;
+  const d=document.createElement('div');d.className='cc-msg cc-ai';d.id='typingRow';
+  d.innerHTML='<span style="opacity:.5;font-size:12px">digitando...</span>';
+  ch.appendChild(d);ch.scrollTop=ch.scrollHeight;
+}
+function removeTyping(){document.getElementById('typingRow')?.remove();}
 function setRings(speaking){
   const p=document.getElementById('avPortrait');
   if(p)p.classList.toggle('av-ring-outer',false); // remove old
@@ -1644,27 +1952,51 @@ function renderExercises(c){
 async function openEx(type){
   if(S.lives<=0){showToast('Sem vidas! Tente amanhã. ❤️');return;}
   const box=document.getElementById('exBox');
-  box.innerHTML='<div style="text-align:center;padding:36px;color:var(--muted)">⏳ Gerando exercício personalizado...</div>';
+  box.innerHTML='<div style="text-align:center;padding:36px;color:var(--muted)">⏳ Gerando exercício...</div>';
   document.getElementById('exModal').classList.remove('hidden');
-  const ldata=ld();const interests=[...(S.profile.sports||[]),(S.profile.movies||[])].filter(Boolean).join(', ');
-  const prompt=`Create a "${type}" exercise in ${LANGS[S.lang].name} for a ${LEVELS[ldata.level||0]} (${COMPLEXITY[ldata.level||0]}) student.${interests?' Use themes from: '+interests+'.':''} Make it fresh and engaging (topic: ${['work','travel','food','technology','sports','culture','daily life'][Math.floor(Math.random()*7)]}).
-Return ONLY valid JSON:
-{"title":"title in Portuguese","instructions":"instructions in Portuguese","questions":[{"type":"multiple_choice","question":"...","options":["A","B","C","D"],"answer":"A","explanation":"why in Portuguese"},{"type":"fill_in","question":"sentence with ___","answer":"correct word","explanation":"..."},{"type":"multiple_choice","question":"...","options":["A","B","C","D"],"answer":"A","explanation":"..."},{"type":"fill_in","question":"...","answer":"...","explanation":"..."}]}`;
+  const ldata=ld();
+  const interests=[...(S.profile.sports||[]),(S.profile.movies||[]),(S.profile.hobbies||[])].filter(Boolean).join(', ');
+  const topics=['work','travel','food','technology','sports','culture','daily life','friendship','nature','shopping'];
+  const topic=topics[Math.floor(Math.random()*topics.length)];
+  const lang=LANGS[S.lang].name;
+  const lvl=LEVELS[ldata.level||0];
+  const prompt=`Create a "${type}" exercise IN ${lang} for a ${lvl} student. Topic: "${topic}".${interests?' Student interests: '+interests+'.':''}
+IMPORTANT: ALL questions, options and text MUST be in ${lang} only. Only explanations can be in Portuguese.
+Return ONLY valid JSON (no markdown):
+{"title":"Exercise title in ${lang}","instructions":"Brief instructions in Portuguese","questions":[
+  {"type":"multiple_choice","question":"Question in ${lang}","options":["Option A in ${lang}","Option B","Option C","Option D"],"answer":"Option A in ${lang}","explanation":"Why in Portuguese"},
+  {"type":"fill_in","question":"Sentence in ${lang} with ___ blank","answer":"correct word in ${lang}","explanation":"Grammar note in Portuguese"},
+  {"type":"multiple_choice","question":"...","options":["A","B","C","D"],"answer":"A","explanation":"..."},
+  {"type":"fill_in","question":"...","answer":"...","explanation":"..."}
+]}`;
   try{
-    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],systemPrompt:'Return ONLY valid JSON without markdown.',userId:S.user?.id})});
+    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],systemPrompt:'Return ONLY valid JSON without markdown. ALL questions and options must be in '+lang+' only.',userId:S.user?.id})});
     const d=await r.json();const ex=JSON.parse(d.reply.replace(/```json\n?|```\n?/g,'').trim());
     renderExModal(ex);
   }catch{box.innerHTML='<div style="text-align:center;padding:36px;color:var(--red)">❌ Tente novamente.</div><div style="text-align:right;margin-top:12px"><button class="btn-back" onclick="closeEx()">Fechar</button></div>';}
 }
+
 function renderExModal(ex){
   const qs=ex.questions||[];curEx={qs,ans:{},submitted:false};
   const box=document.getElementById('exBox');
-  box.innerHTML=`<div class="m-title">${ex.title||'Exercício'}</div><div class="m-sub">${ex.instructions||''}</div>
-    ${qs.map((q,i)=>`<div class="q-block" id="qb${i}"><div class="q-txt">${i+1}. ${q.question}</div>
-      ${q.type==='fill_in'?`<input class="q-fill" id="fa${i}" placeholder="Sua resposta...">`:
-        `<div class="q-opts">${(q.options||[]).map(o=>`<button class="q-opt" onclick="pickOpt(${i},'${esc(o)}',this)">${o}</button>`).join('')}</div>`}
-      <div class="q-res" id="qr${i}"></div></div>`).join('')}
-    <div class="m-footer"><button class="btn-back" onclick="closeEx()">Fechar</button><button class="btn-next" id="exSub" onclick="submitEx()">Verificar ✓</button></div>`;
+  box.innerHTML=`
+    <div class="m-title">${ex.title||'Exercício'}</div>
+    <div class="m-sub">${ex.instructions||''}</div>
+    ${qs.map((q,i)=>`<div class="q-block" id="qb${i}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:9px">
+        <div class="q-txt" style="margin-bottom:0">${i+1}. ${q.question}</div>
+        <button class="tr-btn" onclick="quickTranslate(this,'${esc(q.question)}')" title="Traduzir">🌐</button>
+      </div>
+      <div class="tr-result" id="tr${i}" style="display:none;font-size:11px;color:var(--muted);font-style:italic;padding:4px 8px;background:var(--s2);border-radius:8px;margin-bottom:8px"></div>
+      ${q.type==='fill_in'
+        ?`<input class="q-fill" id="fa${i}" placeholder="Your answer in ${LANGS[S.lang].name}...">`
+        :`<div class="q-opts">${(q.options||[]).map(o=>`<button class="q-opt" onclick="pickOpt(${i},'${esc(o)}',this)">${o}</button>`).join('')}</div>`}
+      <div class="q-res" id="qr${i}"></div>
+    </div>`).join('')}
+    <div class="m-footer">
+      <button class="btn-back" onclick="closeEx()">Fechar</button>
+      <button class="btn-next" id="exSub" onclick="submitEx()">Verificar ✓</button>
+    </div>`;
 }
 function pickOpt(qi,val,btn){if(curEx.ans[qi]!==undefined)return;document.querySelectorAll(`#qb${qi} .q-opt`).forEach(b=>b.style.opacity='.55');btn.style.opacity='1';curEx.ans[qi]=val;}
 function submitEx(){
@@ -1708,54 +2040,98 @@ function renderListening(c){
     </div>
     <div id="listenArea"><div style="text-align:center;padding:30px;color:var(--muted);border:1.5px dashed var(--border);border-radius:14px">Escolha um tipo acima para gerar um novo listening ↑</div></div>`;
 }
+// Real names per language for dialogues
+const REAL_NAMES={
+  en:[['Emma','James'],['Sophia','Lucas'],['Olivia','Noah'],['Ava','Ethan'],['Isabella','Mason']],
+  es:[['Valentina','Santiago'],['Camila','Mateo'],['Sofía','Sebastián'],['Lucia','Diego'],['Maria','Carlos']],
+  fr:[['Léa','Thomas'],['Manon','Hugo'],['Chloé','Louis'],['Emma','Nathan'],['Inès','Maxime']],
+  de:[['Laura','Felix'],['Anna','Lukas'],['Marie','Jonas'],['Lena','Tim'],['Hannah','Maximilian']],
+  ja:[['さくら','けんた'],['あいこ','たろう'],['みき','りょう'],['ゆか','だいすけ'],['なな','こうき']],
+  it:[['Giulia','Marco'],['Sofia','Lorenzo'],['Chiara','Alessandro'],['Martina','Davide'],['Sara','Francesco']],
+};
+
 async function generateListenCard(type){
   const area=document.getElementById('listenArea');
   if(!area)return;
   area.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">⏳ Gerando texto...</div>';
-  const ldata=ld();const interests=[...(S.profile.sports||[]),(S.profile.movies||[])].filter(Boolean).join(', ');
-  const topics=['everyday life','travel','technology','culture','sports','food','work','friendship','nature','city life'];
-  const topic=topics[Math.floor(Math.random()*topics.length)];
-  const lenByLevel=[6,8,10,12,14];const len=lenByLevel[ldata.level||0];
+  const ldata=ld();
+  const interests=[...(S.profile.sports||[]),(S.profile.movies||[]),(S.profile.hobbies||[])].filter(Boolean);
+  const topics=['everyday life','travel at the airport','job interview','ordering food','making new friends','planning a trip','talking about movies','gym conversation','weekend plans','a surprise event'];
+  const topic=interests.length?interests[Math.floor(Math.random()*interests.length)]+' conversation':topics[Math.floor(Math.random()*topics.length)];
+  const lang=LANGS[S.lang].name;const lvl=LEVELS[ldata.level||0];
+  const lenByLevel=[8,10,13,16,20];const len=lenByLevel[ldata.level||0];
+  // Pick real names
+  const nameSet=REAL_NAMES[S.lang]||REAL_NAMES.en;
+  const [name1,name2]=nameSet[Math.floor(Math.random()*nameSet.length)];
   const prompts={
-    dialogue:`Write a natural dialogue between 2 people about "${topic}" in ${LANGS[S.lang].name} for ${LEVELS[ldata.level||0]} level. Make it ${len} lines total, realistic and engaging. Then provide a Portuguese translation.
-Return JSON: {"title":"...","text":"full dialogue","translation":"full Portuguese translation","vocab":[{"w":"word","t":"meaning"}]}`,
-    story:`Write an engaging story about "${topic}" in ${LANGS[S.lang].name} for ${LEVELS[ldata.level||0]} level. Use ${len} sentences, make it interesting with details and emotions.
-Return JSON: {"title":"...","text":"full story text","translation":"full Portuguese translation","vocab":[{"w":"word","t":"meaning"}]}`,
-    interview:`Write a realistic interview about "${topic}" in ${LANGS[S.lang].name} for ${LEVELS[ldata.level||0]} level. ${Math.floor(len/2)} questions with interesting answers.
-Return JSON: {"title":"...","text":"full interview text","translation":"full Portuguese translation","vocab":[{"w":"word","t":"meaning"}]}`,
-    news:`Write a news article about a recent event related to "${topic}" in ${LANGS[S.lang].name} for ${LEVELS[ldata.level||0]} level. ${len} sentences, journalistic style.
-Return JSON: {"title":"...","text":"full article","translation":"full Portuguese translation","vocab":[{"w":"word","t":"meaning"}]}`,
+    dialogue:`Write a realistic, natural dialogue in ${lang} about "${topic}" for a ${lvl} learner.
+Use real names: ${name1} and ${name2} (NOT "Person A" or "Person B").
+Make it ${len} lines total with back-and-forth conversation. Include natural pauses like "Hmm...", "Well...", "You know...", "Actually...".
+Format each line as: "${name1}: [speech]" or "${name2}: [speech]"
+Make it sound like a real conversation, not a textbook example.
+Return ONLY JSON: {"title":"Dialogue title in ${lang}","text":"full dialogue","translation":"full Portuguese translation line by line","vocab":[{"w":"word","t":"Portuguese meaning"}]}`,
+    story:`Write an engaging, descriptive story in ${lang} about "${topic}" for a ${lvl} learner.
+Use ${len} sentences with vivid details, emotions, and a clear plot. Include dialogue with real character names.
+Make it genuinely interesting, not generic.
+Return ONLY JSON: {"title":"Story title in ${lang}","text":"full story","translation":"full Portuguese translation","vocab":[{"w":"word","t":"Portuguese meaning"}]}`,
+    interview:`Write a realistic interview in ${lang} about "${topic}" for a ${lvl} learner.
+Use real names — interviewer: ${name1}, interviewee: ${name2}.
+Include ${Math.floor(len/2)} questions with detailed, natural answers. Include "Hmm", "Well", "That's a great question" etc.
+Format: "${name1}: [question]\\n${name2}: [answer]"
+Return ONLY JSON: {"title":"Interview title in ${lang}","text":"full interview","translation":"full Portuguese translation","vocab":[{"w":"word","t":"Portuguese meaning"}]}`,
+    news:`Write a news report in ${lang} about a recent event related to "${topic}" for a ${lvl} learner.
+Use ${len} sentences, journalistic style with facts, quotes from named people, and context.
+Include 2-3 named sources or witnesses.
+Return ONLY JSON: {"title":"News headline in ${lang}","text":"full news report","translation":"full Portuguese translation","vocab":[{"w":"word","t":"Portuguese meaning"}]}`,
   };
   try{
-    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompts[type]}],systemPrompt:'Return ONLY valid JSON without markdown.',userId:S.user?.id})});
+    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompts[type]}],systemPrompt:'Return ONLY valid JSON without markdown. Use REAL NAMES not Person A/B.',userId:S.user?.id})});
     const d=await r.json();const content=JSON.parse(d.reply.replace(/```json\n?|```\n?/g,'').trim());
-    currentListenCard={...content,type,playing:false,wordIdx:0,utterance:null};
+    currentListenCard={...content,type,playing:false};
     renderListenCard(area,content,type);
-  }catch{area.innerHTML='<div style="text-align:center;padding:24px;color:var(--red)">❌ Erro. Tente novamente.<br><button class="btn-back" onclick="generateListenCard(\''+type+'\')" style="margin-top:10px">Tentar novamente</button></div>';}
+  }catch{area.innerHTML=`<div style="text-align:center;padding:24px;color:var(--red)">❌ Erro. <button class="btn-back" onclick="generateListenCard('${type}')" style="margin-top:10px">Tentar novamente</button></div>`;}
 }
+
 function renderListenCard(area,content,type){
+  // Split into sentences for per-sentence translate buttons
+  const sentences=content.text.split(/(?<=[.!?…])\s+(?=[A-ZА-Я\u00C0-\u00FF\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF]|[A-Za-záéíóú]+:)/);
   const words=content.text.split(/(\s+)/);
   const vocab=(content.vocab||[]).map(v=>`<span style="background:var(--s2);border-radius:8px;padding:3px 10px;font-size:12px;margin:2px;display:inline-block"><strong>${v.w}</strong> = ${v.t}</span>`).join('');
+  const icons={dialogue:'🗣️',story:'📖',interview:'🎤',news:'📰'};
   area.innerHTML=`
     <div class="listen-card">
       <div class="listen-header">
-        <div class="listen-icon">${{dialogue:'🗣️',story:'📖',interview:'🎤',news:'📰'}[type]||'👂'}</div>
-        <div style="flex:1"><div style="font-size:14px;font-weight:700">${content.title}</div><div style="font-size:11px;color:var(--muted)">${LANGS[S.lang].name} • ${LEVELS[(currentListenCard||{}).level||ld().level||0]}</div></div>
+        <div class="listen-icon">${icons[type]||'👂'}</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700">${content.title}</div>
+          <div style="font-size:11px;color:var(--muted)">${LANGS[S.lang].name} • ${LEVELS[ld().level||0]}</div>
+        </div>
         <button class="listen-play-btn" id="listenPlayBtn" onclick="toggleListen()">▶</button>
       </div>
-      <!-- Sync text: words appear as spoken -->
-      <div class="listen-sync" id="listenSync">
+      <div id="listenStatus" style="font-size:11px;color:var(--muted);text-align:center;margin:4px 0 8px">▶ Pressione play — texto sincroniza com a fala</div>
+      <!-- Sync word-by-word display -->
+      <div class="listen-sync" id="listenSync" style="margin-bottom:10px">
         ${words.map((w,i)=>`<span class="listen-word" id="lw${i}">${w}</span>`).join('')}
       </div>
-      <div id="listenStatus" style="font-size:11px;color:var(--muted);text-align:center;margin:6px 0">▶ Pressione play para começar — texto aparece sincronizado</div>
-      <details style="margin-top:10px">
-        <summary style="font-size:12px;font-weight:700;cursor:pointer;color:var(--accent)">🌐 Ver tradução completa</summary>
-        <div style="background:var(--s3);border-radius:10px;padding:12px;font-size:13px;line-height:1.7;margin-top:8px;color:var(--txt2)">${content.translation.replace(/\n/g,'<br>')}</div>
+      <!-- Per-sentence translate buttons -->
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Traduzir por trecho</div>
+        ${sentences.map((s,i)=>`
+          <div style="margin-bottom:6px">
+            <div style="display:flex;align-items:flex-start;gap:5px">
+              <div style="font-size:13px;flex:1;line-height:1.6">${s.trim()}</div>
+              <button class="tr-btn" onclick="quickTranslate(this,'${esc(s.trim())}')">🌐</button>
+            </div>
+          </div>`).join('')}
+      </div>
+      <details style="margin-top:8px">
+        <summary style="font-size:12px;font-weight:700;cursor:pointer;color:var(--accent)">🌐 Tradução completa</summary>
+        <div style="background:var(--s3);border-radius:10px;padding:12px;font-size:13px;line-height:1.7;margin-top:6px;color:var(--txt2)">${content.translation.replace(/\n/g,'<br>')}</div>
       </details>
       ${vocab?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Vocabulário</div>${vocab}</div>`:''}
-      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-        <button onclick="generateListenCard('${type}')" style="flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:10px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--accent)">🔄 Gerar novo ${type}</button>
-        ${LISTEN_TYPES.filter(t=>t.id!==type).map(t=>`<button onclick="generateListenCard('${t.id}')" style="background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:8px 10px;font-size:11px;cursor:pointer">${t.i}</button>`).join('')}
+      <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+        <button onclick="generateListenCard('${type}')" style="flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:10px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--accent)">🔄 Novo ${type}</button>
+        ${LISTEN_TYPES.filter(t=>t.id!==type).map(t=>`<button onclick="generateListenCard('${t.id}')" style="background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:8px 10px;font-size:11px;cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">${t.i} ${t.t}</button>`).join('')}
       </div>
     </div>`;
 }
@@ -2186,11 +2562,48 @@ function renderPodcasts(c){
 async function playPodcast(i){
   const eps=PODS.filter(p=>p.lang==='all'||p.lang===S.lang);const ep=eps[i];
   const c=document.getElementById('estudarContent');if(!c)return;
-  c.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Gerando episódio...</div>';
-  const ldata=ld();
+  c.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Gerando episódio completo (pode demorar ~20s)...</div>';
+  const ldata=ld();const lang=LANGS[S.lang].name;const lvl=LEVELS[ldata.level||0];
+  // A real 8-10 min podcast = ~1200-1500 words spoken at natural pace
   try{
-    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:`Write a podcast episode script titled "${ep.title}" in ${LANGS[S.lang].name} for a ${LEVELS[ldata.level||0]} learner. Make it engaging, 8-10 sentences, with natural speech.
-Return ONLY valid JSON:{"title":"${ep.title}","script":"full podcast script","keypoints":["point 1 in Portuguese","point 2","point 3"],"vocab":[{"word":"...","translation":"..."}]}`}],systemPrompt:'Return ONLY valid JSON without markdown.',userId:S.user?.id})});
+    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:`Write a FULL podcast episode script in ${lang} titled "${ep.title}" for a ${lvl} learner.
+Requirements:
+- This must be a COMPLETE episode that lasts 8-10 minutes when read aloud (approximately 1200-1500 words)
+- Use natural spoken language with pauses marked as "..." and filler words like "Well,", "Now,", "You know,", "Interesting enough,", "So,", "Actually,"
+- Include a host introduction, 3-4 main segments/topics, examples, and a closing
+- Write at ${lvl} language level — not too simple, genuinely educational
+- Include natural transitions between segments: "Moving on to...", "Now let's talk about...", "Before we wrap up..."
+Return ONLY valid JSON:
+{"title":"Episode title in ${lang}","script":"FULL script (1200+ words)","keypoints":["Main point 1 in Portuguese","Main point 2","Main point 3","Main point 4"],"vocab":[{"word":"key word in ${lang}","translation":"Portuguese meaning"},{"word":"...","translation":"..."},{"word":"...","translation":"..."},{"word":"...","translation":"..."},{"word":"...","translation":"..."}]}`}],systemPrompt:'Return ONLY valid JSON without markdown. The script MUST be at least 1200 words long — this is critical.',userId:S.user?.id})});
+    const d=await r.json();const pod=JSON.parse(d.reply.replace(/```json\n?|```\n?/g,'').trim());
+    currentPodScript=pod.script;podPlaying=false;
+    const wordCount=pod.script.split(/\s+/).length;
+    const estMin=Math.round(wordCount/130);// ~130 words/min for slow speech
+    const vocab=(pod.vocab||[]).map(v=>`<span style="background:var(--s2);border-radius:8px;padding:3px 10px;font-size:12px;margin:2px;display:inline-block"><strong>${v.word}</strong> = ${v.translation}</span>`).join('');
+    const words=pod.script.split(/(\s+)/);
+    c.innerHTML=`
+      <div style="background:var(--white);border:1.5px solid var(--accent);border-radius:16px;padding:15px;margin-bottom:10px">
+        <div style="display:flex;gap:11px;align-items:center;margin-bottom:11px">
+          <div class="pod-cover">${ep.icon}</div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:700">${pod.title}</div><div style="font-size:11px;color:var(--muted)">~${estMin} min • ${wordCount} palavras • ${ep.level}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:10px">
+          <button onclick="stopPodcast()" style="background:var(--s2);border:1.5px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px">⏹</button>
+          <button id="podPlayBtn" onclick="togglePodcast()" style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh)">▶</button>
+        </div>
+        <div id="podStatus" style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px">▶ Pressione play — texto sincroniza com a fala</div>
+        <div id="podSyncText" style="font-size:14px;line-height:1.9;padding:10px;background:var(--bg);border-radius:10px;min-height:100px;max-height:280px;overflow-y:auto">
+          ${words.map((w,i)=>`<span id="pw${i}" class="listen-word">${w}</span>`).join('')}
+        </div>
+        ${pod.keypoints?.length?`<div style="margin-top:10px"><div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pontos principais</div>${pod.keypoints.map(p=>`<div style="display:flex;align-items:flex-start;gap:5px;padding:3px 0"><span style="font-size:12px;color:var(--txt2);flex:1">• ${p}</span><button class="tr-btn" onclick="quickTranslate(this,'${esc(p)}')">🌐</button></div>`).join('')}</div>`:''}
+        ${vocab?`<div style="margin-top:9px"><div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Vocabulário</div>${vocab}</div>`:''}
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button onclick="renderPodcasts(document.getElementById('estudarContent'))" style="flex:1;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)">← Voltar</button>
+          <button onclick="generatePodcast()" style="flex:1;background:var(--s2);border:1.5px dashed var(--border2);border-radius:10px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--accent)">✨ Gerar outro</button>
+        </div>
+      </div>`;
+  }catch{renderPodcasts(c);}
+}
     const d=await r.json();const pod=JSON.parse(d.reply.replace(/```json\n?|```\n?/g,'').trim());
     currentPodScript=pod.script;podPlaying=false;
     const vocab=(pod.vocab||[]).map(v=>`<span style="background:var(--s2);border-radius:8px;padding:3px 10px;font-size:12px;margin:2px;display:inline-block"><strong>${v.word}</strong> = ${v.translation}</span>`).join('');
@@ -2267,25 +2680,35 @@ function startSyncedPodcast(){
 }
 async function generatePodcast(){
   const c=document.getElementById('estudarContent');if(!c)return;
-  c.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">✨ Gerando episódio personalizado...</div>';
-  const ldata=ld();const interests=[...(S.profile.sports||[]),(S.profile.movies||[])].filter(Boolean).join(', ');
+  c.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">✨ Gerando episódio personalizado (8-10 min)...</div>';
+  const ldata=ld();
+  const interests=[...(S.profile.sports||[]),(S.profile.movies||[]),(S.profile.hobbies||[])].filter(Boolean).join(', ');
+  const lang=LANGS[S.lang].name;const lvl=LEVELS[ldata.level||0];
   try{
-    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:`Create a personalized podcast episode for a ${LEVELS[ldata.level||0]} ${LANGS[S.lang].name} learner.${interests?' Their interests: '+interests+'.':''} Make it engaging, 8-10 sentences.
-Return ONLY valid JSON:{"title":"catchy title","script":"full script in ${LANGS[S.lang].name}","keypoints":["point 1 PT","point 2","point 3"],"vocab":[{"word":"...","translation":"..."}]}`}],systemPrompt:'Return ONLY valid JSON without markdown.',userId:S.user?.id})});
+    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:`Create a FULL personalized podcast episode in ${lang} for a ${lvl} learner.${interests?' Their interests: '+interests+'.':''}
+Requirements:
+- COMPLETE episode lasting 8-10 minutes (1200-1500 words minimum)
+- Natural spoken language with pauses "...", filler words, transitions
+- Engaging and educational content they will enjoy
+- Introduction, main content (3-4 segments), and conclusion
+Return ONLY valid JSON:{"title":"catchy title","script":"FULL 1200+ word script in ${lang}","keypoints":["key takeaway 1 in Portuguese","key takeaway 2","key takeaway 3","key takeaway 4"],"vocab":[{"word":"word in ${lang}","translation":"Portuguese meaning"},{"word":"...","translation":"..."},{"word":"...","translation":"..."},{"word":"...","translation":"..."}]}`}],systemPrompt:'Return ONLY valid JSON without markdown. Script must be 1200+ words.',userId:S.user?.id})});
     const d=await r.json();const pod=JSON.parse(d.reply.replace(/```json\n?|```\n?/g,'').trim());
     currentPodScript=pod.script;podPlaying=false;
+    const wordCount=pod.script.split(/\s+/).length;
+    const estMin=Math.round(wordCount/130);
     const vocab=(pod.vocab||[]).map(v=>`<span style="background:var(--s2);border-radius:8px;padding:3px 10px;font-size:12px;margin:2px;display:inline-block"><strong>${v.word}</strong> = ${v.translation}</span>`).join('');
     const words=pod.script.split(/(\s+)/);
     c.innerHTML=`
       <div style="background:var(--white);border:1.5px solid var(--accent);border-radius:16px;padding:15px;margin-bottom:10px">
-        <div style="font-size:14px;font-weight:800;margin-bottom:11px">✨ ${pod.title}</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:800;margin-bottom:4px">✨ ${pod.title}</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:11px">~${estMin} min • ${wordCount} palavras</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:10px">
           <button onclick="stopPodcast()" style="background:var(--s2);border:1.5px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px">⏹</button>
           <button id="podPlayBtn" onclick="togglePodcast()" style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh)">▶</button>
         </div>
         <div id="podStatus" style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px">▶ Pressione play</div>
-        <div id="podSyncText" style="font-size:14px;line-height:1.9;padding:10px;background:var(--bg);border-radius:10px;min-height:80px">${words.map((w,i)=>`<span id="pw${i}" class="listen-word">${w}</span>`).join('')}</div>
-        ${pod.keypoints?.length?`<div style="margin-top:10px">${pod.keypoints.map(p=>`<div style="font-size:12px;color:var(--txt2);padding:2px 0">• ${p}</div>`).join('')}</div>`:''}
+        <div id="podSyncText" style="font-size:14px;line-height:1.9;padding:10px;background:var(--bg);border-radius:10px;min-height:100px;max-height:280px;overflow-y:auto">${words.map((w,i)=>`<span id="pw${i}" class="listen-word">${w}</span>`).join('')}</div>
+        ${pod.keypoints?.length?`<div style="margin-top:10px"><div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pontos principais</div>${pod.keypoints.map(p=>`<div style="display:flex;align-items:flex-start;gap:5px;padding:3px 0"><span style="font-size:12px;color:var(--txt2);flex:1">• ${p}</span><button class="tr-btn" onclick="quickTranslate(this,'${esc(p)}')">🌐</button></div>`).join('')}</div>`:''}
         ${vocab?`<div style="margin-top:9px">${vocab}</div>`:''}
         <div style="display:flex;gap:8px;margin-top:12px">
           <button onclick="renderPodcasts(document.getElementById('estudarContent'))" style="flex:1;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px;font-size:12px;cursor:pointer;color:var(--muted)">← Voltar</button>
@@ -2568,10 +2991,49 @@ function pad(n){return String(n).padStart(2,'0');}
 function esc(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 function showToast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);}
 
+// Universal translate button — call with element ref + text to translate
+async function quickTranslate(btn,text){
+  const decoded=text.replace(/&quot;/g,'"').replace(/&lt;/g,'<').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
+  // Find result div sibling or create one
+  let resultEl=btn.parentElement?.nextElementSibling;
+  if(!resultEl||!resultEl.classList.contains('tr-result')){
+    resultEl=document.createElement('div');
+    resultEl.className='tr-result';
+    resultEl.style.cssText='font-size:11px;color:var(--muted);font-style:italic;padding:4px 8px;background:var(--s2);border-radius:8px;margin-top:4px';
+    btn.parentElement?.insertAdjacentElement('afterend',resultEl);
+  }
+  // Toggle off if already showing
+  if(resultEl.style.display==='block'){resultEl.style.display='none';btn.style.opacity='1';return;}
+  btn.textContent='⏳';btn.disabled=true;
+  try{
+    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:`Translate ONLY to Brazilian Portuguese, just the translation nothing else:\n"${decoded}"`}],
+        systemPrompt:'Respond ONLY with the Portuguese translation. No explanations.',userId:S.user?.id})});
+    const d=await r.json();const tr=(d.reply||'').trim().replace(/^["']|["']$/g,'');
+    resultEl.textContent='🇧🇷 '+tr;resultEl.style.display='block';
+  }catch{resultEl.textContent='Erro ao traduzir.';resultEl.style.display='block';}
+  btn.textContent='🌐';btn.disabled=false;
+}
+
 // ════ BOOT ════
 (async()=>{
-  const{data:{session}}=await sb.auth.getSession();
-  if(session){S.user=session.user;S.token=session.access_token;await loadProfile();}
+  // Pre-fill saved email
+  try{const saved=localStorage.getItem('lingua_email');if(saved){const el=document.getElementById('le');if(el)el.value=saved;}}catch{}
+  // Restore existing session
+  try{
+    const{data:{session}}=await sb.auth.getSession();
+    if(session&&session.user){S.user=session.user;S.token=session.access_token;await loadProfile();return;}
+  }catch{}
+  // Listen for future auth changes (token refresh etc.)
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='SIGNED_IN'&&session&&!S.user){
+      S.user=session.user;S.token=session.access_token;await loadProfile();
+    }else if(event==='TOKEN_REFRESHED'&&session){
+      S.token=session.access_token;
+    }else if(event==='SIGNED_OUT'){
+      S.user=null;S.token=null;
+    }
+  });
 })();
 
 if(window.speechSynthesis){
