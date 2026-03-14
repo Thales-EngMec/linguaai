@@ -431,6 +431,12 @@ button,input,textarea,select{font-family:'Outfit',sans-serif;}
       <div class="fld"><label>Senha</label><input id="lp" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="btn-p" id="btn-login" onclick="doLogin()">Entrar</button>
       <div class="amsg" id="lmsg"></div>
+      <div id="loginDebug" style="display:none;margin-top:10px;padding:10px;background:#fff3cd;border-radius:10px;font-size:11px;color:#856404;line-height:1.6">
+        ⚠️ <strong>Se o login não funcionar:</strong><br>
+        Acesse <strong>supabase.com</strong> → seu projeto →<br>
+        Authentication → Providers → Email →<br>
+        <strong>desative "Confirm email"</strong> e salve.
+      </div>
     </div>
     <div id="f-reg" style="display:none">
       <div class="fld"><label>Nome</label><input id="rn" type="text" placeholder="Seu nome" autocomplete="name"></div>
@@ -1284,30 +1290,38 @@ function switchAuth(t){
 }
 async function doLogin(){
   const e=V('le'),p=V('lp'),m=document.getElementById('lmsg');
+  const debug=document.getElementById('loginDebug');
   if(!e||!p){showMsg(m,'Preencha todos os campos','err');return;}
   const btn=document.getElementById('btn-login');
   btn.disabled=true;showMsg(m,'Entrando...','');
+  if(debug)debug.style.display='none';
   try{
     const{data,error}=await sb.auth.signInWithPassword({email:e,password:p});
     btn.disabled=false;
     if(error){
-      // Provide helpful error messages
       const errMap={
         'Invalid login credentials':'E-mail ou senha incorretos.',
-        'Email not confirmed':'Confirme seu e-mail antes de entrar.',
+        'Email not confirmed':'E-mail não confirmado. Desative "Confirm email" no Supabase ou confirme o e-mail.',
         'Too many requests':'Muitas tentativas. Aguarde alguns minutos.',
+        'User not found':'Usuário não encontrado. Verifique o e-mail.',
       };
-      const msg=Object.entries(errMap).find(([k])=>error.message.includes(k))?.[1]||'Erro: '+error.message;
-      showMsg(m,msg,'err');return;
+      const msg=Object.entries(errMap).find(([k])=>error.message?.includes(k))?.[1]||'Erro: '+(error.message||'desconhecido');
+      showMsg(m,msg,'err');
+      if(debug)debug.style.display='block';
+      return;
     }
-    if(!data.session){showMsg(m,'Sessão não iniciada. Tente novamente.','err');return;}
+    if(!data.session){
+      showMsg(m,'Sessão não iniciada. Tente novamente.','err');
+      if(debug)debug.style.display='block';
+      return;
+    }
     S.user=data.user;S.token=data.session.access_token;
-    // Persist session in localStorage as fallback
     try{localStorage.setItem('lingua_email',e);}catch{}
     await loadProfile();
   }catch(ex){
     btn.disabled=false;
-    showMsg(m,'Erro de conexão. Verifique sua internet.','err');
+    showMsg(m,'Erro de conexão: '+(ex.message||'verifique sua internet.'),'err');
+    if(debug)debug.style.display='block';
   }
 }
 
@@ -2597,35 +2611,6 @@ Return ONLY valid JSON:
         </div>
         ${pod.keypoints?.length?`<div style="margin-top:10px"><div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pontos principais</div>${pod.keypoints.map(p=>`<div style="display:flex;align-items:flex-start;gap:5px;padding:3px 0"><span style="font-size:12px;color:var(--txt2);flex:1">• ${p}</span><button class="tr-btn" onclick="quickTranslate(this,'${esc(p)}')">🌐</button></div>`).join('')}</div>`:''}
         ${vocab?`<div style="margin-top:9px"><div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Vocabulário</div>${vocab}</div>`:''}
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button onclick="renderPodcasts(document.getElementById('estudarContent'))" style="flex:1;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)">← Voltar</button>
-          <button onclick="generatePodcast()" style="flex:1;background:var(--s2);border:1.5px dashed var(--border2);border-radius:10px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--accent)">✨ Gerar outro</button>
-        </div>
-      </div>`;
-  }catch{renderPodcasts(c);}
-}
-    const d=await r.json();const pod=JSON.parse(d.reply.replace(/```json\n?|```\n?/g,'').trim());
-    currentPodScript=pod.script;podPlaying=false;
-    const vocab=(pod.vocab||[]).map(v=>`<span style="background:var(--s2);border-radius:8px;padding:3px 10px;font-size:12px;margin:2px;display:inline-block"><strong>${v.word}</strong> = ${v.translation}</span>`).join('');
-    // Word-sync text
-    const words=pod.script.split(/(\s+)/);
-    c.innerHTML=`
-      <div style="background:var(--white);border:1.5px solid var(--accent);border-radius:16px;padding:15px;margin-bottom:10px">
-        <div style="display:flex;gap:11px;align-items:center;margin-bottom:11px">
-          <div class="pod-cover">${ep.icon}</div>
-          <div style="flex:1"><div style="font-size:14px;font-weight:700">${pod.title}</div><div style="font-size:11px;color:var(--muted)">${ep.dur} • ${ep.level}</div></div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:12px">
-          <button onclick="stopPodcast()" style="background:var(--s2);border:1.5px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px">⏹</button>
-          <button id="podPlayBtn" onclick="togglePodcast()" style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh)">▶</button>
-        </div>
-        <div id="podStatus" style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px">▶ Pressione play para iniciar — texto sincroniza conforme a fala</div>
-        <!-- Sync text -->
-        <div id="podSyncText" style="font-size:14px;line-height:1.9;padding:10px;background:var(--bg);border-radius:10px;min-height:80px">
-          ${words.map((w,i)=>`<span id="pw${i}" class="listen-word">${w}</span>`).join('')}
-        </div>
-        ${pod.keypoints?.length?`<div style="margin-top:10px"><div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pontos principais</div>${pod.keypoints.map(p=>`<div style="font-size:12px;color:var(--txt2);padding:2px 0">• ${p}</div>`).join('')}</div>`:''}
-        ${vocab?`<div style="margin-top:9px">${vocab}</div>`:''}
         <div style="display:flex;gap:8px;margin-top:12px">
           <button onclick="renderPodcasts(document.getElementById('estudarContent'))" style="flex:1;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)">← Voltar</button>
           <button onclick="generatePodcast()" style="flex:1;background:var(--s2);border:1.5px dashed var(--border2);border-radius:10px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--accent)">✨ Gerar outro</button>
