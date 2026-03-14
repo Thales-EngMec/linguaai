@@ -800,12 +800,22 @@ button,input,textarea,select{font-family:'Outfit',sans-serif;}
           <div class="avb" style="height:6px"></div><div class="avb" style="height:10px"></div>
         </div>
         <!-- Bottom controls -->
-        <div class="call-controls">
+        <div class="call-controls" id="callControls">
           <div class="gender-row">
             <button class="gen-btn on" id="genF" onclick="setGender('female')">👩 Professora</button>
             <button class="gen-btn" id="genM" onclick="setGender('male')">👨 Professor</button>
+            <!-- Font size + expand controls -->
+            <div style="margin-left:auto;display:flex;gap:4px;align-items:center">
+              <button onclick="changeChatFont(-1)" style="background:rgba(255,255,255,.1);border:none;border-radius:6px;padding:3px 8px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer" title="Diminuir texto">A-</button>
+              <button onclick="changeChatFont(1)" style="background:rgba(255,255,255,.1);border:none;border-radius:6px;padding:3px 8px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer" title="Aumentar texto">A+</button>
+              <button onclick="toggleChatExpand()" id="expandChatBtn" style="background:rgba(255,255,255,.1);border:none;border-radius:6px;padding:3px 8px;font-size:12px;color:rgba(255,255,255,.7);cursor:pointer" title="Expandir chat">⬆</button>
+            </div>
           </div>
-          <div class="call-chat" id="callChat"></div>
+          <!-- Draggable resize handle -->
+          <div id="chatResizeHandle" style="width:100%;height:5px;background:rgba(255,255,255,.07);border-radius:4px;cursor:ns-resize;display:flex;align-items:center;justify-content:center;margin-bottom:5px;user-select:none" title="Arraste para redimensionar">
+            <div style="display:flex;gap:3px"><div style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.35)"></div><div style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.35)"></div><div style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.35)"></div></div>
+          </div>
+          <div class="call-chat" id="callChat" style="font-size:13px"></div>
           <div class="mode-row">
             <button class="mode-b on" id="mCasual" onclick="setMode('casual')">💬 Casual</button>
             <button class="mode-b" id="mLesson" onclick="setMode('lesson')">📚 Aula</button>
@@ -953,308 +963,250 @@ const OB={langs:[],age:'',reasons:[],sports:[],movies:[],gender:'female',pers:'f
 // ════════════════════════════════════════
 //  REALISTIC PORTRAIT AVATAR (SVG)
 // ════════════════════════════════════════
-function buildPortraitSVG(gender,pers,speaking){
-  const t=getTeacher();
-  const isFem=gender==='female';
-  const c=t.c;
+// ═══════════════════════════════════════
+//  AVATAR — Realistic illustrated portrait
+//  Clean modern style (no broken SVG paths)
+// ═══════════════════════════════════════
+function buildPortraitSVG(gender, pers, speaking) {
+  const t = getTeacher();
+  const isFem = gender === 'female';
 
-  // Rich skin/hair palettes per personality
-  const palettes={
-    friendly: {skin:'#F5C8A8',skinD:'#D4956A',skinSh:'#E8A87C',hair:'#4A2208',hairH:'#6B3410',lip:'#D4607A',lipD:'#A03055',cloth:c},
-    formal:   {skin:'#EABF96',skinD:'#C08060',skinSh:'#D4A070',hair:'#1C0E06',hairH:'#3A1E0A',lip:'#C05068',lipD:'#8A2840',cloth:c},
-    energetic:{skin:'#F2C090',skinD:'#CE8850',skinSh:'#E0A060',hair:'#120600',hairH:'#2A0E00',lip:'#D85870',lipD:'#A02848',cloth:c},
-    patient:  {skin:'#F8D5B5',skinD:'#D8A878',skinSh:'#EAC090',hair:'#2E1005',hairH:'#502010',lip:'#CC6878',lipD:'#903050',cloth:c},
-    funny:    {skin:'#FAD0A8',skinD:'#D49860',skinSh:'#E8B478',hair:'#6B2E10',hairH:'#8C4422',lip:'#D87080',lipD:'#A03858',cloth:c},
+  // Skin tones per personality
+  const skins = {
+    friendly:  {face:'#F5C8A0', shadow:'#D4956A', neck:'#F0BC90'},
+    formal:    {face:'#EBBF93', shadow:'#C88558', neck:'#E6B080'},
+    energetic: {face:'#F2BE88', shadow:'#CF8A48', neck:'#EDB278'},
+    patient:   {face:'#F8D5B5', shadow:'#DBA878', neck:'#F2C8A0'},
+    funny:     {face:'#FAD2A8', shadow:'#D89860', neck:'#F4C490'},
   };
-  const p=palettes[pers]||palettes.friendly;
+  const sk = skins[pers] || skins.friendly;
 
-  // ID suffix to avoid SVG gradient id collision between main/mini avatars
-  const uid=Math.random().toString(36).slice(2,7);
+  // Hair colors
+  const hairs = {
+    friendly:'#5C3317', formal:'#1C0E06', energetic:'#120600',
+    patient:'#3A1A08', funny:'#7A3010',
+  };
+  const hairCol = hairs[pers] || '#3D2008';
+  const hairHi  = hairCol.replace(/^#/, '') === '5C3317' ? '#8B5E3C' : '#6B3A1A';
 
-  // Mouth
-  const mouthOpen=speaking;
-  const mouthPath=mouthOpen
-    ?`M 118 250 Q 150 272 182 250 Q 172 280 150 284 Q 128 280 118 250 Z`
-    :`M 122 250 Q 150 262 178 250`;
-  const teethPath=mouthOpen?`<path d="M 120 252 Q 150 268 180 252 Q 172 260 150 262 Q 128 260 120 252 Z" fill="white" opacity=".92"/>
-    <path d="M 120 252 Q 150 268 180 252" stroke="rgba(0,0,0,.08)" stroke-width="1" fill="none"/>
-    `:'';
+  // Lip color
+  const lip = isFem ? '#D4607A' : '#C05565';
+  const acc = t.c; // shirt/accent color
 
-  // === HAIR ===
-  // Female — long layered hair
-  const femHair=`
-    <!-- Hair shadow/back volume -->
-    <ellipse cx="150" cy="88" rx="84" ry="92" fill="${shadeColor(p.hair,-8)}"/>
-    <!-- Side hair -->
-    <ellipse cx="74" cy="185" rx="16" ry="80" fill="${p.hair}"/>
-    <ellipse cx="226" cy="185" rx="16" ry="80" fill="${p.hair}"/>
-    <!-- Long hair draping down -->
-    <path d="M 74 180 Q 60 260 68 340 Q 76 380 90 400" stroke="${p.hair}" stroke-width="30" fill="none" stroke-linecap="round"/>
-    <path d="M 226 180 Q 240 260 232 340 Q 224 380 210 400" stroke="${p.hair}" stroke-width="30" fill="none" stroke-linecap="round"/>
-    <!-- Hair highlight left strand -->
-    <path d="M 78 120 Q 70 180 74 250" stroke="${p.hairH}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".6"/>
-    <!-- Hair top -->
-    <ellipse cx="150" cy="78" rx="76" ry="50" fill="${p.hair}"/>
-    <!-- Part highlight -->
-    <path d="M 130 45 Q 148 38 165 45" stroke="${p.hairH}" stroke-width="8" fill="none" stroke-linecap="round" opacity=".45"/>
+  // Mouth open or closed
+  const mouthOpen = speaking;
+
+  // Background gradient — dark vignette
+  const bg1 = acc + '33'; // accent at 20% opacity
+  const bg2 = '#0e1020';
+
+  // ── HAIR SHAPES ──
+  // Female: shoulder-length wavy hair
+  const femaleHair = `
+    <ellipse cx="150" cy="92" rx="82" ry="90" fill="${hairCol}"/>
+    <path d="M68 130 Q52 210 60 310 Q70 360 85 390" stroke="${hairCol}" stroke-width="36" fill="none" stroke-linecap="round"/>
+    <path d="M232 130 Q248 210 240 310 Q230 360 215 390" stroke="${hairCol}" stroke-width="36" fill="none" stroke-linecap="round"/>
+    <ellipse cx="150" cy="80" rx="68" ry="74" fill="${sk.face}"/>
+    <ellipse cx="68" cy="175" rx="14" ry="72" fill="${hairCol}"/>
+    <ellipse cx="232" cy="175" rx="14" ry="72" fill="${hairCol}"/>
+    <path d="M 100 38 Q 148 22 196 38" stroke="${hairHi}" stroke-width="6" fill="none" stroke-linecap="round" opacity=".4"/>
   `;
-  // Male — short styled hair
-  const maleHairNormal=`
-    <ellipse cx="150" cy="70" rx="74" ry="44" fill="${p.hair}"/>
-    <rect x="76" y="72" width="148" height="24" rx="10" fill="${p.hair}"/>
-    <!-- Hair texture lines -->
-    <path d="M 90 68 Q 120 56 150 54 Q 180 56 210 68" stroke="${p.hairH}" stroke-width="4" fill="none" opacity=".4"/>
-    <path d="M 100 62 Q 130 50 150 48" stroke="${p.hairH}" stroke-width="3" fill="none" opacity=".3"/>
+  // Male: short neat hair
+  const maleHair = `
+    <ellipse cx="150" cy="68" rx="72" ry="46" fill="${hairCol}"/>
+    <rect x="78" y="68" width="144" height="22" rx="11" fill="${hairCol}"/>
+    <ellipse cx="80" cy="100" rx="12" ry="20" fill="${hairCol}"/>
+    <ellipse cx="220" cy="100" rx="12" ry="20" fill="${hairCol}"/>
+    <path d="M 92 50 Q 148 34 208 50" stroke="${hairHi}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".38"/>
   `;
-  const maleHairFormal=`
-    <ellipse cx="150" cy="68" rx="72" ry="40" fill="${p.hair}"/>
-    <!-- Side parting -->
-    <path d="M 80 75 Q 120 55 165 62" stroke="${p.hair}" stroke-width="28" fill="none" stroke-linecap="round"/>
-    <path d="M 108 52 Q 148 40 188 52" fill="${p.hair}"/>
-    <!-- Hair shine -->
-    <path d="M 95 58 Q 130 44 160 52" stroke="${p.hairH}" stroke-width="5" fill="none" opacity=".4"/>
+  // Male formal: side-parted
+  const maleFormal = `
+    <ellipse cx="150" cy="65" rx="72" ry="42" fill="${hairCol}"/>
+    <path d="M 78 70 Q 110 48 150 44 Q 190 48 222 70" stroke="${hairCol}" stroke-width="28" fill="none" stroke-linecap="round"/>
+    <path d="M 82 56 Q 115 40 150 36" stroke="${hairHi}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".4"/>
   `;
 
-  // === FACE SHADING ===
-  const faceShading=`
-    <!-- Cheek shadows -->
-    <ellipse cx="92" cy="205" rx="24" ry="30" fill="${p.skinD}" opacity=".18"/>
-    <ellipse cx="208" cy="205" rx="24" ry="30" fill="${p.skinD}" opacity=".18"/>
-    <!-- Forehead highlight -->
-    <ellipse cx="148" cy="135" rx="32" ry="20" fill="white" opacity=".12"/>
-    <!-- Under-chin shadow -->
-    <ellipse cx="150" cy="275" rx="36" ry="10" fill="${p.skinD}" opacity=".25"/>
-    <!-- Nose bridge shadow -->
-    <rect x="146" y="163" width="8" height="28" rx="4" fill="${p.skinD}" opacity=".15"/>
+  // ── EYES ──
+  const eyeColor = hairCol; // iris matches hair for realism
+  const lashes = isFem
+    ? `<path d="M103 163 Q122 153 140 163" stroke="#0a0500" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+       <path d="M160 163 Q178 153 197 163" stroke="#0a0500" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+       <line x1="105" y1="162" x2="101" y2="155" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
+       <line x1="113" y1="156" x2="111" y2="149" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
+       <line x1="138" y1="162" x2="142" y2="155" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
+       <line x1="162" y1="162" x2="158" y2="155" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
+       <line x1="188" y1="156" x2="190" y2="149" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
+       <line x1="196" y1="163" x2="200" y2="156" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>`
+    : `<path d="M103 165 Q122 155 140 165" stroke="#0a0500" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+       <path d="M160 165 Q178 155 197 165" stroke="#0a0500" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+
+  const eyes = `
+    <ellipse cx="122" cy="170" rx="19" ry="14" fill="white"/>
+    <ellipse cx="178" cy="170" rx="19" ry="14" fill="white"/>
+    <circle cx="122" cy="171" r="10" fill="${eyeColor}"/>
+    <circle cx="178" cy="171" r="10" fill="${eyeColor}"/>
+    <circle cx="122" cy="172" r="5.5" fill="#0a0500"/>
+    <circle cx="178" cy="172" r="5.5" fill="#0a0500"/>
+    <circle cx="126" cy="166" r="3" fill="white" opacity=".9"/>
+    <circle cx="182" cy="166" r="3" fill="white" opacity=".9"/>
+    <circle cx="119" cy="174" r="1.3" fill="white" opacity=".45"/>
+    <circle cx="175" cy="174" r="1.3" fill="white" opacity=".45"/>
+    ${lashes}
+    <path d="M105 177 Q122 183 139 177" stroke="${hairCol}" stroke-width="1.2" fill="none" opacity=".4"/>
+    <path d="M161 177 Q178 183 195 177" stroke="${hairCol}" stroke-width="1.2" fill="none" opacity=".4"/>
   `;
 
-  // === EYES ===
-  // Eye shape with eyelid crease
-  const eyeColor=p.hair; // match hair for realism
-  const eyes=`
-    <!-- Left eye shadow -->
-    <ellipse cx="122" cy="168" rx="21" ry="15" fill="${p.skinD}" opacity=".25"/>
-    <!-- Right eye shadow -->
-    <ellipse cx="178" cy="168" rx="21" ry="15" fill="${p.skinD}" opacity=".25"/>
-    <!-- Left sclera -->
-    <ellipse cx="122" cy="167" rx="18" ry="13" fill="white"/>
-    <!-- Right sclera -->
-    <ellipse cx="178" cy="167" rx="18" ry="13" fill="white"/>
-    <!-- Left iris gradient -->
-    <circle cx="122" cy="168" r="10" fill="${eyeColor}" opacity=".9"/>
-    <circle cx="122" cy="168" r="10" fill="url(#irisG${uid})" opacity=".6"/>
-    <!-- Right iris -->
-    <circle cx="178" cy="168" r="10" fill="${eyeColor}" opacity=".9"/>
-    <circle cx="178" cy="168" r="10" fill="url(#irisG${uid})" opacity=".6"/>
-    <!-- Pupils -->
-    <circle cx="122" cy="169" r="5.5" fill="#0a0500"/>
-    <circle cx="178" cy="169" r="5.5" fill="#0a0500"/>
-    <!-- Eye shines — main -->
-    <circle cx="126" cy="164" r="2.8" fill="white" opacity=".95"/>
-    <circle cx="182" cy="164" r="2.8" fill="white" opacity=".95"/>
-    <!-- Eye shine — secondary -->
-    <circle cx="119" cy="172" r="1.2" fill="white" opacity=".45"/>
-    <circle cx="175" cy="172" r="1.2" fill="white" opacity=".45"/>
-    <!-- Upper eyelid crease -->
-    <path d="M 104 161 Q 122 154 140 161" stroke="${p.skinD}" stroke-width="1.8" fill="none" opacity=".5"/>
-    <path d="M 160 161 Q 178 154 196 161" stroke="${p.skinD}" stroke-width="1.8" fill="none" opacity=".5"/>
-    <!-- Upper lashes -->
-    ${isFem?`
-    <path d="M 104 160 Q 113 152 122 157 Q 131 152 140 160" stroke="#0a0500" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M 160 160 Q 169 152 178 157 Q 187 152 196 160" stroke="#0a0500" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <!-- Lash extensions -->
-    <line x1="106" y1="160" x2="102" y2="155" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="112" y1="155" x2="110" y2="150" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="138" y1="159" x2="141" y2="154" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="162" y1="159" x2="159" y2="154" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="188" y1="155" x2="190" y2="150" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="194" y1="160" x2="198" y2="155" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-    `:`
-    <path d="M 105 162 Q 122 155 139 162" stroke="#0a0500" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M 161 162 Q 178 155 195 162" stroke="#0a0500" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    `}
-    <!-- Lower lash line -->
-    <path d="M 106 175 Q 122 180 138 175" stroke="${p.hair}" stroke-width="1.2" fill="none" opacity=".4"/>
-    <path d="M 162 175 Q 178 180 194 175" stroke="${p.hair}" stroke-width="1.2" fill="none" opacity=".4"/>
+  // ── BROWS ──
+  const brows = isFem
+    ? `<path d="M104 150 Q120 140 138 146" stroke="${hairCol}" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".9"/>
+       <path d="M162 146 Q180 140 196 150" stroke="${hairCol}" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".9"/>`
+    : `<path d="M102 150 Q119 140 139 146" stroke="${hairCol}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".92"/>
+       <path d="M161 146 Q181 140 198 150" stroke="${hairCol}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".92"/>`;
+
+  // ── NOSE ──
+  const nose = `
+    <path d="M148 178 C147 192 141 210 140 218 Q150 225 160 218 C159 210 153 192 152 178" fill="${sk.shadow}" opacity=".28"/>
+    <ellipse cx="141" cy="220" rx="8" ry="5.5" fill="${sk.shadow}" opacity=".3"/>
+    <ellipse cx="159" cy="220" rx="8" ry="5.5" fill="${sk.shadow}" opacity=".3"/>
   `;
 
-  // === EYEBROWS ===
-  const brows=isFem?`
-    <path d="M 104 147 Q 118 138 136 143" stroke="${p.hair}" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".88"/>
-    <path d="M 104 147 Q 118 138 136 143" stroke="${p.hair}" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"/>
-    <path d="M 164 143 Q 180 138 196 147" stroke="${p.hair}" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".88"/>
-    <path d="M 164 143 Q 180 138 196 147" stroke="${p.hair}" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"/>
-  `:`
-    <path d="M 102 148 Q 118 139 138 144" stroke="${p.hair}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".9"/>
-    <path d="M 162 144 Q 180 139 198 148" stroke="${p.hair}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".9"/>
+  // ── MOUTH ──
+  const mouthSVG = mouthOpen
+    ? `<path d="M120 252 Q150 276 180 252 Q168 282 150 286 Q132 282 120 252Z" fill="#7A1020"/>
+       <path d="M122 254 Q150 272 178 254 Q168 260 150 264 Q132 260 122 254Z" fill="white" opacity=".88"/>
+       <path d="M118 248 Q136 242 150 244 Q164 242 182 248" stroke="${lip}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`
+    : `<path d="M122 248 Q138 240 150 242 Q162 240 178 248" stroke="${lip}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+       <path d="M122 248 Q150 262 178 248" stroke="${lip}" stroke-width="2" fill="${lip}" opacity=".7"/>
+       <ellipse cx="148" cy="254" rx="9" ry="3" fill="white" opacity=".18"/>`;
+
+  // ── BLUSH ──
+  const blush = isFem
+    ? `<ellipse cx="100" cy="218" rx="26" ry="15" fill="#FF80A0" opacity=".18"/>
+       <ellipse cx="200" cy="218" rx="26" ry="15" fill="#FF80A0" opacity=".18"/>`
+    : '';
+
+  // ── EARRINGS ──
+  const earrings = isFem
+    ? `<circle cx="78" cy="206" r="9" fill="${acc}" opacity=".92"/>
+       <circle cx="78" cy="206" r="4.5" fill="white" opacity=".4"/>
+       <circle cx="222" cy="206" r="9" fill="${acc}" opacity=".92"/>
+       <circle cx="222" cy="206" r="4.5" fill="white" opacity=".4"/>`
+    : '';
+
+  // ── GLASSES (formal only) ──
+  const glasses = pers === 'formal'
+    ? `<path d="M97 160 Q97 182 122 182 Q147 182 147 160 Q147 142 122 142 Q97 142 97 160Z" fill="none" stroke="${hairCol}" stroke-width="3.5" opacity=".78"/>
+       <path d="M153 160 Q153 182 178 182 Q203 182 203 160 Q203 142 178 142 Q153 142 153 160Z" fill="none" stroke="${hairCol}" stroke-width="3.5" opacity=".78"/>
+       <line x1="147" y1="159" x2="153" y2="159" stroke="${hairCol}" stroke-width="3" opacity=".78"/>
+       <path d="M97 155 L82 148" stroke="${hairCol}" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
+       <path d="M203 155 L218 148" stroke="${hairCol}" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
+       <path d="M97 160 Q97 182 122 182 Q147 182 147 160 Q147 142 122 142 Q97 142 97 160Z" fill="${acc}" opacity=".07"/>`
+    : '';
+
+  // ── NECK ──
+  const neck = `
+    <rect x="129" y="292" width="42" height="58" rx="19" fill="${sk.neck}"/>
+    <rect x="133" y="292" width="34" height="58" rx="17" fill="${sk.face}" opacity=".5"/>
   `;
 
-  // === NOSE ===
-  const nose=`
-    <!-- Nose bridge -->
-    <path d="M 150 175 C 148 188 142 205 140 215 Q 150 222 160 215 C 158 205 152 188 150 175" fill="${p.skinD}" opacity=".28"/>
-    <!-- Nostrils -->
-    <ellipse cx="142" cy="218" rx="8" ry="6" fill="${p.skinD}" opacity=".35"/>
-    <ellipse cx="158" cy="218" rx="8" ry="6" fill="${p.skinD}" opacity=".35"/>
-    <!-- Nose tip highlight -->
-    <ellipse cx="150" cy="213" rx="6" ry="4" fill="white" opacity=".14"/>
+  // ── SHIRT ──
+  const shirtFem = `
+    <ellipse cx="150" cy="395" rx="120" ry="58" fill="${acc}" opacity=".96"/>
+    <path d="M118 345 Q134 358 150 374 Q166 358 182 345 Q168 338 150 336 Q132 338 118 345Z" fill="${acc}" opacity=".85"/>
+    <path d="M150 336 L150 374" stroke="white" stroke-width="1.5" opacity=".18"/>
+  `;
+  const shirtMale = `
+    <ellipse cx="150" cy="398" rx="126" ry="58" fill="${acc}" opacity=".96"/>
+    <path d="M114 344 L148 378 L152 378 L186 344 Q170 336 150 334 Q130 336 114 344Z" fill="${acc}" opacity=".85"/>
+    <path d="M114 344 L148 378 M186 344 L152 378" stroke="white" stroke-width="1.5" opacity=".15"/>
+    <rect x="148" y="355" width="4" height="42" rx="2" fill="white" opacity=".15"/>
   `;
 
-  // === LIPS ===
-  const lips=`
-    <!-- Upper lip -->
-    <path d="M 118 246 Q 130 240 150 242 Q 170 240 182 246 Q 170 250 150 250 Q 130 250 118 246 Z" fill="${p.lip}" opacity=".9"/>
-    <!-- Cupid's bow detail -->
-    <path d="M 132 243 Q 142 238 150 240 Q 158 238 168 243" stroke="${p.lipD}" stroke-width="1.5" fill="none" opacity=".6"/>
-    <!-- Lower lip -->
-    <path d="${mouthPath}" fill="${mouthOpen?'#7A1020':p.lip}" stroke="none" opacity=".92"/>
-    ${teethPath}
-    <!-- Lip highlight -->
-    <ellipse cx="148" cy="257" rx="10" ry="3.5" fill="white" opacity="${mouthOpen?0:.22}"/>
-    <ellipse cx="148" cy="244" rx="7" ry="2.5" fill="white" opacity=".18"/>
+  // ── FACE SHADING ──
+  const shading = `
+    <ellipse cx="90" cy="208" rx="25" ry="30" fill="${sk.shadow}" opacity=".16"/>
+    <ellipse cx="210" cy="208" rx="25" ry="30" fill="${sk.shadow}" opacity=".16"/>
+    <ellipse cx="150" cy="138" rx="34" ry="22" fill="white" opacity=".10"/>
+    <ellipse cx="150" cy="278" rx="38" ry="10" fill="${sk.shadow}" opacity=".22"/>
   `;
 
-  // === ACCESSORIES ===
-  const femEarrings=`
-    <circle cx="80" cy="204" r="9" fill="${c}" opacity=".92"/>
-    <circle cx="80" cy="204" r="5" fill="${shadeColor(c,30)}" opacity=".6"/>
-    <circle cx="220" cy="204" r="9" fill="${c}" opacity=".92"/>
-    <circle cx="220" cy="204" r="5" fill="${shadeColor(c,30)}" opacity=".6"/>
-  `;
-  const glassesShape=pers==='formal'?`
-    <!-- Glasses frame left -->
-    <path d="M 97 156 Q 97 178 122 178 Q 147 178 147 156 Q 147 140 122 140 Q 97 140 97 156 Z" fill="none" stroke="${shadeColor(p.hair,10)}" stroke-width="3.5" opacity=".8"/>
-    <!-- Glasses frame right -->
-    <path d="M 153 156 Q 153 178 178 178 Q 203 178 203 156 Q 203 140 178 140 Q 153 140 153 156 Z" fill="none" stroke="${shadeColor(p.hair,10)}" stroke-width="3.5" opacity=".8"/>
-    <!-- Bridge -->
-    <line x1="147" y1="156" x2="153" y2="156" stroke="${shadeColor(p.hair,10)}" stroke-width="3" opacity=".8"/>
-    <!-- Lens tint -->
-    <path d="M 97 156 Q 97 178 122 178 Q 147 178 147 156 Q 147 140 122 140 Q 97 140 97 156 Z" fill="${c}" opacity=".08"/>
-    <path d="M 153 156 Q 153 178 178 178 Q 203 178 203 156 Q 203 140 178 140 Q 153 140 153 156 Z" fill="${c}" opacity=".08"/>
-  `:'';
-
-  // === SHIRT & NECK ===
-  const neck=`
-    <rect x="130" y="292" width="40" height="62" rx="18" fill="${p.skin}"/>
-    <!-- Neck shadow -->
-    <rect x="130" y="292" width="40" height="62" rx="18" fill="${p.skinD}" opacity=".2"/>
-    <rect x="136" y="292" width="28" height="62" rx="14" fill="${p.skin}"/>
-  `;
-  const shirtFem=`
-    <!-- Shoulders -->
-    <ellipse cx="150" cy="390" rx="118" ry="55" fill="${c}" opacity=".97"/>
-    <!-- V-neck collar -->
-    <path d="M 120 345 Q 135 355 150 372 Q 165 355 180 345 Q 165 342 150 340 Q 135 342 120 345 Z" fill="${shadeColor(c,-20)}" opacity=".9"/>
-    <!-- Fabric highlight -->
-    <path d="M 80 365 Q 100 355 130 352" stroke="white" stroke-width="2" fill="none" opacity=".15"/>
-  `;
-  const shirtMale=`
-    <!-- Shoulders -->
-    <ellipse cx="150" cy="395" rx="124" ry="55" fill="${c}" opacity=".97"/>
-    <!-- Collar shirt lines -->
-    <path d="M 115 346 L 148 376 L 152 376 L 185 346 Q 170 340 150 338 Q 130 340 115 346 Z" fill="${shadeColor(c,-25)}" opacity=".92"/>
-    <!-- Button placket -->
-    <rect x="148" y="355" width="4" height="45" rx="2" fill="${shadeColor(c,-30)}" opacity=".4"/>
-    <!-- Fabric highlight -->
-    <path d="M 78 368 Q 100 358 130 354" stroke="white" stroke-width="2.5" fill="none" opacity=".15"/>
-  `;
-
-  // Blush
-  const blush=isFem?`
-    <ellipse cx="100" cy="216" rx="26" ry="16" fill="#ff80a0" opacity=".18"/>
-    <ellipse cx="200" cy="216" rx="26" ry="16" fill="#ff80a0" opacity=".18"/>
-  `:'';
+  // ── UNIQUE ID to avoid SVG defs collision ──
+  const uid = Math.random().toString(36).slice(2, 7);
 
   return `
     <defs>
-      <radialGradient id="bgG${uid}" cx="50%" cy="25%" r="75%">
-        <stop offset="0%" stop-color="${c}" stop-opacity=".2"/>
-        <stop offset="60%" stop-color="#1a1f36" stop-opacity=".9"/>
-        <stop offset="100%" stop-color="#0a0d1a" stop-opacity="1"/>
+      <radialGradient id="bg${uid}" cx="50%" cy="22%" r="75%">
+        <stop offset="0%" stop-color="${bg1}"/>
+        <stop offset="65%" stop-color="#161830"/>
+        <stop offset="100%" stop-color="${bg2}"/>
       </radialGradient>
-      <radialGradient id="skinG${uid}" cx="42%" cy="30%" r="68%">
-        <stop offset="0%" stop-color="white" stop-opacity=".18"/>
-        <stop offset="40%" stop-color="${p.skin}"/>
-        <stop offset="100%" stop-color="${p.skinD}"/>
+      <radialGradient id="face${uid}" cx="42%" cy="28%" r="70%">
+        <stop offset="0%" stop-color="white" stop-opacity=".15"/>
+        <stop offset="45%" stop-color="${sk.face}"/>
+        <stop offset="100%" stop-color="${sk.shadow}"/>
       </radialGradient>
-      <radialGradient id="irisG${uid}" cx="35%" cy="30%" r="70%">
-        <stop offset="0%" stop-color="${p.hairH}" stop-opacity=".7"/>
-        <stop offset="100%" stop-color="${shadeColor(p.hair,-30)}" stop-opacity=".9"/>
-      </radialGradient>
-      <filter id="fSh${uid}" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="5" result="blur"/>
-        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-      </filter>
-      <filter id="fFace${uid}">
-        <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="rgba(0,0,0,.45)"/>
+      <filter id="faceDrop${uid}">
+        <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="rgba(0,0,0,.42)"/>
       </filter>
     </defs>
 
-    <!-- ── BACKGROUND ── -->
-    <rect width="300" height="420" fill="url(#bgG${uid})"/>
-    <!-- Background accent light -->
-    <ellipse cx="150" cy="120" rx="110" ry="110" fill="${c}" opacity=".07"/>
-    <ellipse cx="150" cy="380" rx="150" ry="80" fill="${c}" opacity=".06"/>
+    <!-- Background -->
+    <rect width="300" height="420" fill="url(#bg${uid})"/>
+    <ellipse cx="150" cy="110" rx="105" ry="105" fill="${acc}" opacity=".06"/>
+    <ellipse cx="150" cy="390" rx="155" ry="75" fill="${acc}" opacity=".05"/>
 
-    <!-- ── HAIR (back layer) ── -->
-    ${isFem ? femHair : pers==='formal'?maleHairFormal:maleHairNormal}
+    <!-- Hair back -->
+    ${isFem ? femaleHair : pers === 'formal' ? maleFormal : maleHair}
 
-    <!-- ── NECK ── -->
+    <!-- Neck -->
     ${neck}
 
-    <!-- ── FACE BASE ── -->
-    <ellipse cx="150" cy="188" rx="70" ry="80" fill="url(#skinG${uid})" filter="url(#fFace${uid})"/>
+    <!-- Face base -->
+    <ellipse cx="150" cy="190" rx="72" ry="82" fill="url(#face${uid})" filter="url(#faceDrop${uid})"/>
 
-    <!-- ── EARS ── -->
-    <ellipse cx="80" cy="198" rx="13" ry="20" fill="${p.skin}"/>
-    <ellipse cx="82" cy="198" rx="8" ry="13" fill="${p.skinSh}"/>
-    <ellipse cx="220" cy="198" rx="13" ry="20" fill="${p.skin}"/>
-    <ellipse cx="218" cy="198" rx="8" ry="13" fill="${p.skinSh}"/>
+    <!-- Ears -->
+    <ellipse cx="78" cy="200" rx="13" ry="20" fill="${sk.face}"/>
+    <ellipse cx="80" cy="200" rx="7.5" ry="13" fill="${sk.shadow}" opacity=".4"/>
+    <ellipse cx="222" cy="200" rx="13" ry="20" fill="${sk.face}"/>
+    <ellipse cx="220" cy="200" rx="7.5" ry="13" fill="${sk.shadow}" opacity=".4"/>
 
-    <!-- ── FACE SHADING ── -->
-    ${faceShading}
+    <!-- Face shading -->
+    ${shading}
 
-    <!-- ── EYEBROWS ── -->
+    <!-- Eyebrows -->
     ${brows}
 
-    <!-- ── EYES ── -->
+    <!-- Eyes -->
     ${eyes}
 
-    <!-- ── GLASSES ── -->
-    ${glassesShape}
+    <!-- Glasses -->
+    ${glasses}
 
-    <!-- ── NOSE ── -->
+    <!-- Nose -->
     ${nose}
 
-    <!-- ── BLUSH ── -->
+    <!-- Blush -->
     ${blush}
 
-    <!-- ── LIPS / MOUTH ── -->
-    ${lips}
+    <!-- Mouth -->
+    ${mouthSVG}
 
-    <!-- ── EARRINGS (female) ── -->
-    ${isFem ? femEarrings : ''}
+    <!-- Earrings (female) -->
+    ${earrings}
 
-    <!-- ── HAIR (front layer) ── -->
-    ${isFem ? `
-      <!-- Front hairline and bangs -->
-      <ellipse cx="150" cy="84" rx="74" ry="38" fill="${p.hair}"/>
-      <!-- Side sweep left -->
-      <path d="M 76 110 Q 82 78 108 70" stroke="${p.hair}" stroke-width="20" fill="none" stroke-linecap="round"/>
-      <!-- Side sweep right -->
-      <path d="M 224 110 Q 218 78 192 70" stroke="${p.hair}" stroke-width="20" fill="none" stroke-linecap="round"/>
-      <!-- Hair highlight shine -->
-      <path d="M 118 46 Q 148 34 172 46" stroke="${p.hairH}" stroke-width="7" fill="none" stroke-linecap="round" opacity=".38"/>
-      <path d="M 125 52 Q 150 40 175 52" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" opacity=".12"/>
-    ` : `
-      <!-- Hairline front -->
-      <ellipse cx="150" cy="80" rx="70" ry="30" fill="${p.hair}"/>
-      <!-- Temple sides -->
-      <ellipse cx="82" cy="98" rx="12" ry="18" fill="${p.hair}"/>
-      <ellipse cx="218" cy="98" rx="12" ry="18" fill="${p.hair}"/>
-    `}
+    <!-- Hair front (over face) -->
+    ${isFem
+      ? `<ellipse cx="150" cy="86" rx="74" ry="40" fill="${hairCol}"/>
+         <path d="M76 112 Q80 78 108 68" stroke="${hairCol}" stroke-width="22" fill="none" stroke-linecap="round"/>
+         <path d="M224 112 Q220 78 192 68" stroke="${hairCol}" stroke-width="22" fill="none" stroke-linecap="round"/>
+         <path d="M106 44 Q148 28 192 44" stroke="${hairHi}" stroke-width="6" fill="none" stroke-linecap="round" opacity=".35"/>
+         <path d="M112 52 Q150 36 188 52" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" opacity=".10"/>`
+      : `<ellipse cx="150" cy="80" rx="70" ry="30" fill="${hairCol}"/>
+         <ellipse cx="82" cy="100" rx="12" ry="18" fill="${hairCol}"/>
+         <ellipse cx="218" cy="100" rx="12" ry="18" fill="${hairCol}"/>`
+    }
 
-    <!-- ── SHIRT ── -->
+    <!-- Shirt -->
     ${isFem ? shirtFem : shirtMale}
   `;
 }
@@ -1368,19 +1320,47 @@ async function loadProfile(){
     const r=await fetch(API+'/api/profile',{headers:{Authorization:'Bearer '+S.token}});
     if(r.ok){
       const p=await r.json();
-      Object.assign(S,{profile:p,langData:p.langData||{},lang:p.lang||'en',
-        gender:p.gender||'female',pers:p.pers||'friendly',lives:p.lives??12,
-        streak:p.streak||0,gameStats:p.gameStats||{played:0,correct:0,bestStreak:0,score:0},
-        lessonCount:p.lessonCount||0,convCount:p.convCount||0,exerciseScore:p.exerciseScore||0});
-      initApp();
+      // Profile exists — load everything and go straight to app
+      Object.assign(S,{
+        profile:p,
+        langData:p.langData||{},
+        lang:p.lang||'en',
+        gender:p.gender||'female',
+        pers:p.pers||'friendly',
+        lives:p.lives??12,
+        streak:p.streak||0,
+        gameStats:p.gameStats||{played:0,correct:0,bestStreak:0,score:0},
+        lessonCount:p.lessonCount||0,
+        convCount:p.convCount||0,
+        exerciseScore:p.exerciseScore||0
+      });
+      // Only show onboarding if profile explicitly not done
+      if(!p.obDone){
+        showOB();
+      }else{
+        initApp();
+      }
+    }else if(r.status===401){
+      // Token expired — try refresh
+      try{
+        const{data:{session}}=await sb.auth.refreshSession();
+        if(session){S.token=session.access_token;await loadProfile();}
+        else{showScr('auth');}
+      }catch{showScr('auth');}
     }else{
-      // Profile not found — new user or first login
+      // Profile not in DB yet — truly new user, show onboarding
       S.profile={name:S.user.user_metadata?.name||S.user.email?.split('@')[0]||'Aluno'};
       showOB();
     }
   }catch(ex){
-    S.profile={name:S.user.user_metadata?.name||'Aluno'};
-    showOB();
+    console.warn('loadProfile error:',ex);
+    // Network error — if we have some cached state, still try to show app
+    if(S.profile?.obDone){
+      initApp();
+    }else{
+      S.profile={name:S.user?.user_metadata?.name||'Aluno'};
+      showOB();
+    }
   }
 }
 async function saveProfile(){
@@ -1518,9 +1498,15 @@ function submitFill(){
   const bank=TEST_BANKS[TS.lang]||TEST_BANKS.en;
   const q=bank.questions[TS.qi];
   const ua=(document.getElementById('testFill')?.value||'').trim().toLowerCase();
-  const ca=(q.a||'').toLowerCase();
-  const ok=ua===ca||ua.includes(ca)||ca.includes(ua)||(ua.length>2&&ca.split(' ').some(w=>ua.includes(w)));
   const fill=document.getElementById('testFill');
+  // Never accept empty
+  if(!ua){
+    if(fill){fill.style.borderColor='var(--red)';fill.placeholder='⚠️ Escreva sua resposta!';}
+    showToast('⚠️ Digite sua resposta antes de confirmar!');
+    return;
+  }
+  const ca=(q.a||'').toLowerCase();
+  const ok=ua===ca||ua.includes(ca)||ca.includes(ua)||(ua.length>2&&ca.split(' ').some(w=>w.length>2&&ua.includes(w)));
   if(fill){fill.disabled=true;fill.style.borderColor=ok?'var(--green)':'var(--red)';}
   const res=document.createElement('div');
   res.style.cssText=`margin-top:7px;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;background:${ok?'#edfff8':'#fff0f3'};color:${ok?'#059669':'var(--red)'};border:1px solid ${ok?'#a7f3d0':'#fecdd3'}`;
@@ -2014,23 +2000,42 @@ function renderExModal(ex){
 }
 function pickOpt(qi,val,btn){if(curEx.ans[qi]!==undefined)return;document.querySelectorAll(`#qb${qi} .q-opt`).forEach(b=>b.style.opacity='.55');btn.style.opacity='1';curEx.ans[qi]=val;}
 function submitEx(){
-  if(!curEx||curEx.submitted)return;curEx.submitted=true;
-  const{qs}=curEx;let ok=0,fail=0;
+  if(!curEx||curEx.submitted)return;
+  // Validate all fill_in fields are not empty before submitting
+  const{qs}=curEx;
+  let hasEmpty=false;
   qs.forEach((q,i)=>{
-    const ua=(curEx.ans[i]||(document.getElementById('fa'+i)?.value)||'').trim().toLowerCase();
-    const ca=(q.answer||'').trim().toLowerCase();const correct=ua===ca||ua.includes(ca)||ca.includes(ua);
+    if(q.type==='fill_in'){
+      const v=(document.getElementById('fa'+i)?.value||'').trim();
+      if(!v&&curEx.ans[i]===undefined){
+        hasEmpty=true;
+        const inp=document.getElementById('fa'+i);
+        if(inp){inp.style.borderColor='var(--red)';inp.placeholder='⚠️ Campo obrigatório!';}
+      }
+    }
+  });
+  if(hasEmpty){showToast('⚠️ Preencha todas as lacunas antes de verificar!');return;}
+  curEx.submitted=true;
+  let ok=0,fail=0;
+  qs.forEach((q,i)=>{
+    const rawVal=curEx.ans[i]||(document.getElementById('fa'+i)?.value)||'';
+    const ua=rawVal.trim().toLowerCase();
+    const ca=(q.answer||'').trim().toLowerCase();
+    // Empty = always wrong
+    const correct=ua.length>0&&(ua===ca||ua.includes(ca)||ca.includes(ua));
     if(correct)ok++;else fail++;
     if(q.type==='multiple_choice'){document.querySelectorAll(`#qb${i} .q-opt`).forEach(b=>{const bv=b.textContent.trim().toLowerCase();if(bv===ca)b.classList.add('correct');else if(bv===(curEx.ans[i]||'').toLowerCase()&&!correct)b.classList.add('wrong');});}
-    const res=document.getElementById('qr'+i);if(res){res.className='q-res '+(correct?'ok':'no');res.textContent=correct?'✅ Correto!':`❌ Correto: ${q.answer}${q.explanation?' — '+q.explanation:''}`;}
+    const res=document.getElementById('qr'+i);
+    if(res){res.className='q-res '+(correct?'ok':'no');res.textContent=correct?'✅ Correto!':`❌ Correto: ${q.answer}${q.explanation?' — '+q.explanation:''}`;}
   });
   if(fail>0)loseLife(fail);
   const xp=ok*12,ldata=ld();
-  const newExScore=(ldata.totalExScore||0)+ok*10;
-  setLd({xp:(ldata.xp||0)+xp,totalLessons:(ldata.totalLessons||0)+1,totalExScore:newExScore});
+  setLd({xp:(ldata.xp||0)+xp,totalLessons:(ldata.totalLessons||0)+1,totalExScore:(ldata.totalExScore||0)+ok*10});
   recalcLevel();
   const sc=document.createElement('div');sc.className='score-box';
   sc.innerHTML=`<div class="score-n">${ok}/${qs.length}</div><div style="color:var(--muted);font-size:13px">${ok===qs.length?'🎉 Perfeito!':ok>=qs.length/2?'👍 Bom!':'💪 Continue!'}</div><div style="font-size:12px;color:var(--green);font-weight:700;margin-top:3px">+${xp} XP${fail>0?' | -'+fail+'❤️':''}</div>`;
-  document.getElementById('exBox').insertBefore(sc,document.getElementById('exBox').firstChild);
+  const box=document.getElementById('exBox');
+  box.insertBefore(sc,box.firstChild);
   document.getElementById('exSub').style.display='none';
   saveProfile();
 }
@@ -2408,12 +2413,21 @@ function showCheckpoint(idx){
 }
 function checkStoryBlank(idx,correct){
   const input=document.getElementById('stBlank'+idx);if(!input)return;
-  const ua=input.value.trim().toLowerCase();const ca=correct.toLowerCase();
-  const ok=ua===ca||ua.includes(ca)||ca.includes(ua);
+  const ua=input.value.trim().toLowerCase();
+  const ca=(correct||'').toLowerCase().trim();
+  // NEVER accept empty
+  if(!ua){
+    const res=document.getElementById('stBlankResult'+idx);
+    if(res){res.style.color='var(--red)';res.textContent='❌ Digite sua resposta antes de verificar!';}
+    input.style.borderColor='var(--red)';
+    return;
+  }
+  const ok=ua===ca||(ua.length>1&&ca.includes(ua))||(ca.length>1&&ua.includes(ca));
   const res=document.getElementById('stBlankResult'+idx);
-  if(res){res.style.color=ok?'#059669':'var(--red)';res.textContent=ok?'✅ Correto!':'❌ Resposta: '+correct;}
+  if(res){res.style.color=ok?'#059669':'var(--red)';res.textContent=ok?'✅ Correto!':'❌ Resposta correta: '+correct;}
   input.style.borderColor=ok?'var(--green)':'var(--red)';
-  if(ok)gainLife(0.5|0);else loseLife(1);
+  if(ok){const ldata=ld();setLd({xp:(ldata.xp||0)+10});}
+  else loseLife(1);
 }
 function checkStoryQ(btn,ans,correct,idx){
   if(btn.closest('.story-pause-q').querySelector('.ok,.no'))return;
@@ -2768,11 +2782,12 @@ const GAME_CATS=[
   {id:'entertainment',icon:'🎬',name:'Entretenimento',color:'#8B5CF6'},
   {id:'sports',icon:'⚽',name:'Esportes',color:'#10B981'},
   {id:'geography',icon:'🌍',name:'Geografia',color:'#3B82F6'},
+  {id:'history',icon:'📜',name:'História',color:'#D97706'},
   {id:'idioms',icon:'🌟',name:'Expressões',color:'#F59E0B'},
   {id:'numbers',icon:'🔢',name:'Números',color:'#EF4444'},
   {id:'random',icon:'🎲',name:'Aleatório',color:'#6366F1'},
 ];
-let QZ={qs:[],qi:0,ok:0,fail:0,streak:0,cat:0,timer:null,sec:35,spinning:false};
+let QZ={qs:[],qi:0,ok:0,fail:0,streak:0,cat:0,timer:null,sec:35,spinning:false,answered:false};
 
 function renderGames(){
   const gs=S.gameStats||{};
@@ -2847,61 +2862,139 @@ function spinWheel(){
 }
 
 async function startQuizCat(catIdx){
-  QZ={qs:[],qi:0,ok:0,fail:0,streak:0,cat:catIdx,timer:null,sec:35,spinning:false};
+  QZ={qs:[],qi:0,ok:0,fail:0,streak:0,cat:catIdx,timer:null,sec:35,spinning:false,answered:false};
   const gs=document.getElementById('gameScreen');gs.classList.remove('hidden');
-  gs.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Gerando perguntas...</div>';
-  const cat=GAME_CATS[catIdx];const ldata=ld();const interests=[...(S.profile.sports||[]),(S.profile.movies||[])].join(', ');
+  gs.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:32px;margin-bottom:12px">⏳</div>Gerando perguntas...<br><div style="font-size:12px;margin-top:8px;color:var(--muted)">Isso pode levar alguns segundos</div></div>';
+  const cat=GAME_CATS[catIdx];const ldata=ld();
+  const interests=[...(S.profile.sports||[]),(S.profile.movies||[])].join(', ');
   const catInstructions={
-    entertainment:`questions about movies, series, music, pop culture in ${LANGS[S.lang].name}`,
-    sports:`questions about ALL sports: football, basketball, F1, tennis, Olympics, MMA, etc in ${LANGS[S.lang].name}`,
-    geography:`questions about countries, capitals, oceans, continents, rivers, flags in ${LANGS[S.lang].name}`,
-    idioms:`questions about idiomatic expressions, their meanings and usage in ${LANGS[S.lang].name}`,
-    numbers:`questions about numbers, math terms, dates, measurements in ${LANGS[S.lang].name}`,
-    random:`random mix of all topics in ${LANGS[S.lang].name}`,
+    entertainment:`questions about movies, TV series, music artists, pop culture, famous actors in ${LANGS[S.lang].name}. Include questions like "Which movie won the Oscar in..." or "Who sang..."`,
+    sports:`questions about ALL sports in ${LANGS[S.lang].name}: rules, famous athletes, championship years, records, countries. Football, basketball, F1, tennis, Olympics, MMA, etc.`,
+    geography:`questions in ${LANGS[S.lang].name} about: country capitals, oceans that border countries, continents, rivers, mountains, flags, population facts. E.g. "What is the capital of Australia?"`,
+    history:`questions in ${LANGS[S.lang].name} about historical events: years things happened, names of historical figures, wars, inventions, famous dates. E.g. "In what year did World War II end?", "Who invented the telephone?"`,
+    idioms:`questions about idiomatic expressions and their meanings in ${LANGS[S.lang].name}. Include the expression and ask what it means.`,
+    numbers:`questions in ${LANGS[S.lang].name} involving numbers, math, dates, measurements, conversions, statistics. E.g. "How many sides does a hexagon have?", "What is 15% of 200?"`,
+    random:`mix of all topics in ${LANGS[S.lang].name}: geography, history, sports, culture, science, math, idioms`,
   };
-  try{
-    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:`Create 8 quiz questions: ${catInstructions[cat.id]||catInstructions.random}. Level: ${LEVELS[ldata.level||0]}.${interests?' Student likes: '+interests+'.':''} Mix easy and hard.
-Return ONLY valid JSON:{"questions":[{"question":"...","options":["A: ...","B: ...","C: ...","D: ..."],"answer":"A: ...","explanation":"why in Portuguese","category":"${cat.name}"}]}`}],systemPrompt:'Return ONLY valid JSON without markdown.',userId:S.user?.id})});
-    const d=await r.json();const data=JSON.parse(d.reply.replace(/```json\n?|```\n?/g,'').trim());
-    QZ.qs=data.questions||[];renderQuizQ();
-  }catch{gs.classList.add('hidden');showToast('Erro ao gerar perguntas. Tente novamente!');}
+  // Retry up to 2 times on failure
+  let attempts=0;
+  while(attempts<2){
+    attempts++;
+    try{
+      const r=await fetch(API+'/api/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          messages:[{role:'user',content:`Create 8 quiz questions: ${catInstructions[cat.id]||catInstructions.random}.
+Level: ${LEVELS[ldata.level||0]}.${interests?' Student interests: '+interests+'.':''} Make questions interesting and varied.
+Return ONLY valid JSON (no markdown, no text outside JSON):
+{"questions":[{"question":"...","options":["A: ...","B: ...","C: ...","D: ..."],"answer":"A: ...","explanation":"brief explanation in Portuguese"}]}`}],
+          systemPrompt:'Return ONLY valid JSON. No markdown. No text before or after the JSON object.',
+          userId:S.user?.id
+        })
+      });
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const d=await r.json();
+      const raw=d.reply?.replace(/```json\n?|```\n?/g,'').trim()||'';
+      const data=JSON.parse(raw);
+      if(!data.questions?.length)throw new Error('No questions');
+      QZ.qs=data.questions;
+      renderQuizQ();
+      return;
+    }catch(e){
+      if(attempts>=2){
+        gs.innerHTML=`<div style="padding:40px;text-align:center">
+          <div style="font-size:32px;margin-bottom:12px">❌</div>
+          <div style="color:var(--red);font-size:14px;margin-bottom:16px">Erro ao carregar perguntas.<br>Tente novamente.</div>
+          <div style="display:flex;gap:10px;justify-content:center">
+            <button class="btn-back" onclick="closeGame()">Fechar</button>
+            <button class="btn-next" onclick="startQuizCat(${catIdx})">Tentar novamente</button>
+          </div>
+        </div>`;
+      }else{
+        await new Promise(r=>setTimeout(r,1000));// wait 1s before retry
+      }
+    }
+  }
 }
+
 function renderQuizQ(){
   const q=QZ.qs[QZ.qi];if(!q){showQuizResult();return;}
   const gs=document.getElementById('gameScreen');
   const pct=Math.round(QZ.qi/QZ.qs.length*100);
-  QZ.sec=35;clearInterval(QZ.timer);
+  QZ.sec=35;QZ.answered=false;clearInterval(QZ.timer);
   gs.innerHTML=`
     <div style="padding:13px;max-width:520px;margin:0 auto;width:100%">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <button onclick="closeGame()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer">✕ Sair</button>
         <div style="font-size:12px;font-weight:700;color:var(--accent)">✅${QZ.ok} ❌${QZ.fail}</div>
       </div>
-      <div style="background:var(--border);border-radius:4px;height:5px;margin-bottom:9px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,${GAME_CATS[QZ.cat].color},var(--accent));border-radius:4px;width:${pct}%;transition:width .4s"></div></div>
+      <div style="background:var(--border);border-radius:4px;height:5px;margin-bottom:9px;overflow:hidden">
+        <div style="height:100%;background:linear-gradient(90deg,${GAME_CATS[QZ.cat].color},var(--accent));border-radius:4px;width:${pct}%;transition:width .4s"></div>
+      </div>
       <div class="quiz-timer" id="qtimer">⏱ ${QZ.sec}s</div>
-      <div class="quiz-q-box">
+      <div class="quiz-q-box" id="quizQBox">
         <div style="font-size:10px;color:var(--muted);font-weight:700;margin-bottom:5px">${QZ.qi+1}/${QZ.qs.length} — ${GAME_CATS[QZ.cat].icon} ${q.category||GAME_CATS[QZ.cat].name}</div>
         <div style="font-size:15px;font-weight:600;margin-bottom:13px;line-height:1.5">${q.question}</div>
         <div class="quiz-opts">${(q.options||[]).map(o=>`<button class="quiz-opt" onclick="pickQ('${esc(o)}',this)">${o}</button>`).join('')}</div>
+      </div>
+      <div id="nextBtnArea" style="display:none;text-align:center;margin-top:12px">
+        <button onclick="goNextQ()" style="background:linear-gradient(135deg,var(--accent),var(--a2));border:none;color:#fff;padding:11px 32px;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(91,110,245,.35)">
+          Próxima →
+        </button>
       </div>
       <div style="display:flex;align-items:center;gap:7px;justify-content:center;margin-top:8px">
         <span style="font-size:17px">🔥</span><span style="font-size:16px;font-weight:800;color:#ea580c">${QZ.streak}</span><span style="font-size:11px;color:var(--muted)">sequência</span>
       </div>
     </div>`;
   QZ.timer=setInterval(()=>{
-    QZ.sec--;const el=document.getElementById('qtimer');
+    if(QZ.answered)return;// pause timer after answer
+    QZ.sec--;
+    const el=document.getElementById('qtimer');
     if(el){el.textContent='⏱ '+QZ.sec+'s';if(QZ.sec<=8)el.classList.add('urg');}
-    if(QZ.sec<=0){clearInterval(QZ.timer);QZ.fail++;QZ.streak=0;loseLife(1);setTimeout(()=>{QZ.qi++;renderQuizQ();},300);}
+    if(QZ.sec<=0){
+      clearInterval(QZ.timer);
+      if(!QZ.answered){
+        QZ.answered=true;QZ.fail++;QZ.streak=0;loseLife(1);
+        const el2=document.getElementById('qtimer');if(el2)el2.textContent='⏱ Tempo esgotado!';
+        // Show correct answer
+        document.querySelectorAll('.quiz-opt').forEach(b=>{
+          b.onclick=null;b.style.cursor='default';
+          if(b.textContent.trim()===q.answer)b.classList.add('correct');
+        });
+        const nb=document.getElementById('nextBtnArea');if(nb)nb.style.display='block';
+      }
+    }
   },1000);
 }
+
 function pickQ(ans,btn){
-  clearInterval(QZ.timer);const q=QZ.qs[QZ.qi];
+  if(QZ.answered)return;// prevent double click
+  QZ.answered=true;
+  clearInterval(QZ.timer);
+  const q=QZ.qs[QZ.qi];
   document.querySelectorAll('.quiz-opt').forEach(b=>{b.onclick=null;b.style.cursor='default';});
-  const ok=ans===q.answer;btn.classList.add(ok?'correct':'wrong');
+  const ok=ans===q.answer;
+  btn.classList.add(ok?'correct':'wrong');
   document.querySelectorAll('.quiz-opt').forEach(b=>{if(b.textContent.trim()===q.answer)b.classList.add('correct');});
-  if(q.explanation){const qBox=document.querySelector('.quiz-q-box');if(qBox){const exp=document.createElement('div');exp.style.cssText='margin-top:9px;padding:8px 11px;background:var(--s2);border-radius:9px;font-size:12px;color:var(--txt2)';exp.textContent='💡 '+q.explanation;qBox.appendChild(exp);}}
-  if(ok){QZ.ok++;QZ.streak++;if(QZ.streak%5===0)gainLife(1);}else{QZ.fail++;QZ.streak=0;loseLife(1);}
-  setTimeout(()=>{QZ.qi++;renderQuizQ();},1100);
+  // Show explanation
+  if(q.explanation){
+    const qBox=document.getElementById('quizQBox');
+    if(qBox){
+      const exp=document.createElement('div');
+      exp.style.cssText='margin-top:10px;padding:9px 12px;background:var(--s2);border-radius:10px;font-size:12px;color:var(--txt2);line-height:1.5;border-left:3px solid '+(ok?'var(--green)':'var(--red)');
+      exp.innerHTML=(ok?'✅ ':'❌ ')+'<strong>'+q.answer+'</strong><br>💡 '+q.explanation;
+      qBox.appendChild(exp);
+    }
+  }
+  if(ok){QZ.ok++;QZ.streak++;if(QZ.streak%5===0)gainLife(1);}
+  else{QZ.fail++;QZ.streak=0;loseLife(1);}
+  // Show "Próxima" button — user controls when to advance
+  const nb=document.getElementById('nextBtnArea');if(nb)nb.style.display='block';
+}
+
+function goNextQ(){
+  QZ.qi++;renderQuizQ();
 }
 function showQuizResult(){
   const total=QZ.ok+QZ.fail;const pct=total?Math.round(QZ.ok/total*100):0;const xp=QZ.ok*15;
@@ -3000,19 +3093,74 @@ async function quickTranslate(btn,text){
   btn.textContent='🌐';btn.disabled=false;
 }
 
+// ════ CHAT RESIZE + FONT SIZE ════
+let chatFontSize=13,chatExpanded=false;
+function changeChatFont(delta){
+  chatFontSize=Math.max(10,Math.min(20,chatFontSize+delta));
+  const ch=document.getElementById('callChat');
+  if(ch)ch.style.fontSize=chatFontSize+'px';
+}
+function toggleChatExpand(){
+  chatExpanded=!chatExpanded;
+  const ch=document.getElementById('callChat');
+  const btn=document.getElementById('expandChatBtn');
+  if(ch){
+    ch.style.maxHeight=chatExpanded?'320px':'90px';
+    ch.style.transition='max-height .3s ease';
+  }
+  if(btn)btn.textContent=chatExpanded?'⬇':'⬆';
+}
+function initChatResize(){
+  const handle=document.getElementById('chatResizeHandle');
+  const chat=document.getElementById('callChat');
+  if(!handle||!chat)return;
+  let startY=0,startH=0,dragging=false;
+  handle.addEventListener('mousedown',e=>{
+    dragging=true;startY=e.clientY;startH=chat.offsetHeight;
+    e.preventDefault();
+  });
+  handle.addEventListener('touchstart',e=>{
+    dragging=true;startY=e.touches[0].clientY;startH=chat.offsetHeight;
+    e.preventDefault();
+  },{passive:false});
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const dy=startY-e.clientY;// drag up = increase height
+    const newH=Math.max(40,Math.min(350,startH+dy));
+    chat.style.maxHeight=newH+'px';
+  });
+  document.addEventListener('touchmove',e=>{
+    if(!dragging)return;
+    const dy=startY-e.touches[0].clientY;
+    const newH=Math.max(40,Math.min(350,startH+dy));
+    chat.style.maxHeight=newH+'px';
+  },{passive:true});
+  const stopDrag=()=>{dragging=false;};
+  document.addEventListener('mouseup',stopDrag);
+  document.addEventListener('touchend',stopDrag);
+}
+
 // ════ BOOT ════
 (async()=>{
   // Pre-fill saved email
-  try{const saved=localStorage.getItem('lingua_email');if(saved){const el=document.getElementById('le');if(el)el.value=saved;}}catch{}
-  // Restore existing session
+  try{
+    const saved=localStorage.getItem('lingua_email');
+    if(saved){const el=document.getElementById('le');if(el)el.value=saved;}
+  }catch{}
+  // Restore existing session — this auto-logs in if session still valid
   try{
     const{data:{session}}=await sb.auth.getSession();
-    if(session&&session.user){S.user=session.user;S.token=session.access_token;await loadProfile();return;}
-  }catch{}
-  // Listen for future auth changes (token refresh etc.)
+    if(session&&session.user){
+      S.user=session.user;S.token=session.access_token;
+      await loadProfile();
+      return;
+    }
+  }catch(e){console.warn('Session restore failed:',e);}
+  // Listen for auth state changes (handles token refresh, etc.)
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session&&!S.user){
-      S.user=session.user;S.token=session.access_token;await loadProfile();
+    if((event==='SIGNED_IN'||event==='INITIAL_SESSION')&&session&&!S.user){
+      S.user=session.user;S.token=session.access_token;
+      await loadProfile();
     }else if(event==='TOKEN_REFRESHED'&&session){
       S.token=session.access_token;
     }else if(event==='SIGNED_OUT'){
@@ -3035,6 +3183,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('exModal')?.addEventListener('click',e=>{if(e.target===document.getElementById('exModal'))closeEx();});
   document.getElementById('langModal')?.addEventListener('click',e=>{if(e.target===document.getElementById('langModal'))closeLangModal();});
   document.getElementById('chalModal')?.addEventListener('click',e=>{if(e.target===document.getElementById('chalModal'))closeChal();});
+  // Init chat resize after DOM ready
+  setTimeout(initChatResize, 500);
 });
 </script>
 </body>
