@@ -964,14 +964,31 @@ const OB={langs:[],age:'',reasons:[],sports:[],movies:[],gender:'female',pers:'f
 //  REALISTIC PORTRAIT AVATAR (SVG)
 // ════════════════════════════════════════
 // ═══════════════════════════════════════
-//  AVATAR — Realistic illustrated portrait
-//  Clean modern style (no broken SVG paths)
+//  AVATAR — Real teacher photo (female) + SVG (male)
 // ═══════════════════════════════════════
+const TEACHER_PHOTO_F = 'data:image/jpeg;base64,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';
+
 function buildPortraitSVG(gender, pers, speaking) {
   const t = getTeacher();
   const isFem = gender === 'female';
 
-  // Skin tones per personality
+  // Female: use real photo with animated mouth overlay
+  if (isFem) {
+    const mouthAnim = speaking
+      ? `<ellipse cx="50%" cy="72%" rx="12%" ry="7%" fill="#8B1A2A" opacity=".85"/>
+         <ellipse cx="50%" cy="70%" rx="11%" ry="3%" fill="white" opacity=".7"/>`
+      : '';
+    return `
+      <defs>
+        <clipPath id="photoClip"><circle cx="150" cy="180" r="148"/></clipPath>
+      </defs>
+      <image href="${TEACHER_PHOTO_F}" x="0" y="0" width="300" height="420" preserveAspectRatio="xMidYMin slice" clip-path="url(#photoClip)"/>
+      ${mouthAnim}
+      ${speaking ? '<circle cx="150" cy="180" r="148" fill="none" stroke="rgba(91,110,245,.35)" stroke-width="4"/>' : ''}
+    `;
+  }
+
+  // Male: detailed SVG illustration
   const skins = {
     friendly:  {face:'#F5C8A0', shadow:'#D4956A', neck:'#F0BC90'},
     formal:    {face:'#EBBF93', shadow:'#C88558', neck:'#E6B080'},
@@ -980,158 +997,66 @@ function buildPortraitSVG(gender, pers, speaking) {
     funny:     {face:'#FAD2A8', shadow:'#D89860', neck:'#F4C490'},
   };
   const sk = skins[pers] || skins.friendly;
-
-  // Hair colors
-  const hairs = {
-    friendly:'#5C3317', formal:'#1C0E06', energetic:'#120600',
-    patient:'#3A1A08', funny:'#7A3010',
-  };
+  const hairs = { friendly:'#5C3317', formal:'#1C0E06', energetic:'#120600', patient:'#3A1A08', funny:'#7A3010' };
   const hairCol = hairs[pers] || '#3D2008';
-  const hairHi  = hairCol.replace(/^#/, '') === '5C3317' ? '#8B5E3C' : '#6B3A1A';
-
-  // Lip color
-  const lip = isFem ? '#D4607A' : '#C05565';
-  const acc = t.c; // shirt/accent color
-
-  // Mouth open or closed
-  const mouthOpen = speaking;
-
-  // Background gradient — dark vignette
-  const bg1 = acc + '33'; // accent at 20% opacity
+  const hairHi  = '#8B5E3C';
+  const lip = '#C05565';
+  const acc = t.c;
   const bg2 = '#0e1020';
+  const bg1 = acc + '33';
+  const uid = Math.random().toString(36).slice(2,7);
 
-  // ── HAIR SHAPES ──
-  // Female: shoulder-length wavy hair
-  const femaleHair = `
-    <ellipse cx="150" cy="92" rx="82" ry="90" fill="${hairCol}"/>
-    <path d="M68 130 Q52 210 60 310 Q70 360 85 390" stroke="${hairCol}" stroke-width="36" fill="none" stroke-linecap="round"/>
-    <path d="M232 130 Q248 210 240 310 Q230 360 215 390" stroke="${hairCol}" stroke-width="36" fill="none" stroke-linecap="round"/>
-    <ellipse cx="150" cy="80" rx="68" ry="74" fill="${sk.face}"/>
-    <ellipse cx="68" cy="175" rx="14" ry="72" fill="${hairCol}"/>
-    <ellipse cx="232" cy="175" rx="14" ry="72" fill="${hairCol}"/>
-    <path d="M 100 38 Q 148 22 196 38" stroke="${hairHi}" stroke-width="6" fill="none" stroke-linecap="round" opacity=".4"/>
-  `;
-  // Male: short neat hair
-  const maleHair = `
-    <ellipse cx="150" cy="68" rx="72" ry="46" fill="${hairCol}"/>
-    <rect x="78" y="68" width="144" height="22" rx="11" fill="${hairCol}"/>
-    <ellipse cx="80" cy="100" rx="12" ry="20" fill="${hairCol}"/>
-    <ellipse cx="220" cy="100" rx="12" ry="20" fill="${hairCol}"/>
-    <path d="M 92 50 Q 148 34 208 50" stroke="${hairHi}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".38"/>
-  `;
-  // Male formal: side-parted
-  const maleFormal = `
-    <ellipse cx="150" cy="65" rx="72" ry="42" fill="${hairCol}"/>
-    <path d="M 78 70 Q 110 48 150 44 Q 190 48 222 70" stroke="${hairCol}" stroke-width="28" fill="none" stroke-linecap="round"/>
-    <path d="M 82 56 Q 115 40 150 36" stroke="${hairHi}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".4"/>
-  `;
-
-  // ── EYES ──
-  const eyeColor = hairCol; // iris matches hair for realism
-  const lashes = isFem
-    ? `<path d="M103 163 Q122 153 140 163" stroke="#0a0500" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-       <path d="M160 163 Q178 153 197 163" stroke="#0a0500" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-       <line x1="105" y1="162" x2="101" y2="155" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-       <line x1="113" y1="156" x2="111" y2="149" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-       <line x1="138" y1="162" x2="142" y2="155" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-       <line x1="162" y1="162" x2="158" y2="155" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-       <line x1="188" y1="156" x2="190" y2="149" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>
-       <line x1="196" y1="163" x2="200" y2="156" stroke="#0a0500" stroke-width="1.5" stroke-linecap="round"/>`
-    : `<path d="M103 165 Q122 155 140 165" stroke="#0a0500" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-       <path d="M160 165 Q178 155 197 165" stroke="#0a0500" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
-
-  const eyes = `
-    <ellipse cx="122" cy="170" rx="19" ry="14" fill="white"/>
-    <ellipse cx="178" cy="170" rx="19" ry="14" fill="white"/>
-    <circle cx="122" cy="171" r="10" fill="${eyeColor}"/>
-    <circle cx="178" cy="171" r="10" fill="${eyeColor}"/>
-    <circle cx="122" cy="172" r="5.5" fill="#0a0500"/>
-    <circle cx="178" cy="172" r="5.5" fill="#0a0500"/>
-    <circle cx="126" cy="166" r="3" fill="white" opacity=".9"/>
-    <circle cx="182" cy="166" r="3" fill="white" opacity=".9"/>
-    <circle cx="119" cy="174" r="1.3" fill="white" opacity=".45"/>
-    <circle cx="175" cy="174" r="1.3" fill="white" opacity=".45"/>
-    ${lashes}
-    <path d="M105 177 Q122 183 139 177" stroke="${hairCol}" stroke-width="1.2" fill="none" opacity=".4"/>
-    <path d="M161 177 Q178 183 195 177" stroke="${hairCol}" stroke-width="1.2" fill="none" opacity=".4"/>
-  `;
-
-  // ── BROWS ──
-  const brows = isFem
-    ? `<path d="M104 150 Q120 140 138 146" stroke="${hairCol}" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".9"/>
-       <path d="M162 146 Q180 140 196 150" stroke="${hairCol}" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".9"/>`
-    : `<path d="M102 150 Q119 140 139 146" stroke="${hairCol}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".92"/>
-       <path d="M161 146 Q181 140 198 150" stroke="${hairCol}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".92"/>`;
-
-  // ── NOSE ──
-  const nose = `
-    <path d="M148 178 C147 192 141 210 140 218 Q150 225 160 218 C159 210 153 192 152 178" fill="${sk.shadow}" opacity=".28"/>
-    <ellipse cx="141" cy="220" rx="8" ry="5.5" fill="${sk.shadow}" opacity=".3"/>
-    <ellipse cx="159" cy="220" rx="8" ry="5.5" fill="${sk.shadow}" opacity=".3"/>
-  `;
-
-  // ── MOUTH ──
+  const mouthOpen = speaking;
   const mouthSVG = mouthOpen
     ? `<path d="M120 252 Q150 276 180 252 Q168 282 150 286 Q132 282 120 252Z" fill="#7A1020"/>
        <path d="M122 254 Q150 272 178 254 Q168 260 150 264 Q132 260 122 254Z" fill="white" opacity=".88"/>
        <path d="M118 248 Q136 242 150 244 Q164 242 182 248" stroke="${lip}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`
     : `<path d="M122 248 Q138 240 150 242 Q162 240 178 248" stroke="${lip}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-       <path d="M122 248 Q150 262 178 248" stroke="${lip}" stroke-width="2" fill="${lip}" opacity=".7"/>
-       <ellipse cx="148" cy="254" rx="9" ry="3" fill="white" opacity=".18"/>`;
+       <path d="M122 248 Q150 262 178 248" stroke="${lip}" stroke-width="2" fill="${lip}" opacity=".7"/>`;
 
-  // ── BLUSH ──
-  const blush = isFem
-    ? `<ellipse cx="100" cy="218" rx="26" ry="15" fill="#FF80A0" opacity=".18"/>
-       <ellipse cx="200" cy="218" rx="26" ry="15" fill="#FF80A0" opacity=".18"/>`
-    : '';
+  const maleHairNormal = `
+    <ellipse cx="150" cy="68" rx="72" ry="46" fill="${hairCol}"/>
+    <rect x="78" y="68" width="144" height="22" rx="11" fill="${hairCol}"/>
+    <ellipse cx="80" cy="100" rx="12" ry="20" fill="${hairCol}"/>
+    <ellipse cx="220" cy="100" rx="12" ry="20" fill="${hairCol}"/>
+    <path d="M 92 50 Q 148 34 208 50" stroke="${hairHi}" stroke-width="5" fill="none" opacity=".38"/>`;
+  const maleHairFormal = `
+    <ellipse cx="150" cy="65" rx="72" ry="42" fill="${hairCol}"/>
+    <path d="M 78 70 Q 110 48 150 44 Q 190 48 222 70" stroke="${hairCol}" stroke-width="28" fill="none" stroke-linecap="round"/>
+    <path d="M 82 56 Q 115 40 150 36" stroke="${hairHi}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".4"/>`;
 
-  // ── EARRINGS ──
-  const earrings = isFem
-    ? `<circle cx="78" cy="206" r="9" fill="${acc}" opacity=".92"/>
-       <circle cx="78" cy="206" r="4.5" fill="white" opacity=".4"/>
-       <circle cx="222" cy="206" r="9" fill="${acc}" opacity=".92"/>
-       <circle cx="222" cy="206" r="4.5" fill="white" opacity=".4"/>`
-    : '';
+  const eyes = `
+    <ellipse cx="122" cy="170" rx="19" ry="14" fill="white"/>
+    <ellipse cx="178" cy="170" rx="19" ry="14" fill="white"/>
+    <circle cx="122" cy="171" r="10" fill="${hairCol}"/>
+    <circle cx="178" cy="171" r="10" fill="${hairCol}"/>
+    <circle cx="122" cy="172" r="5.5" fill="#0a0500"/>
+    <circle cx="178" cy="172" r="5.5" fill="#0a0500"/>
+    <circle cx="126" cy="166" r="3" fill="white" opacity=".9"/>
+    <circle cx="182" cy="166" r="3" fill="white" opacity=".9"/>
+    <path d="M103 165 Q122 155 140 165" stroke="#0a0500" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M160 165 Q178 155 197 165" stroke="#0a0500" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
 
-  // ── GLASSES (formal only) ──
+  const brows = `
+    <path d="M102 150 Q119 140 139 146" stroke="${hairCol}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".92"/>
+    <path d="M161 146 Q181 140 198 150" stroke="${hairCol}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".92"/>`;
+
+  const nose = `
+    <path d="M148 178 C147 192 141 210 140 218 Q150 225 160 218 C159 210 153 192 152 178" fill="${sk.shadow}" opacity=".28"/>
+    <ellipse cx="141" cy="220" rx="8" ry="5.5" fill="${sk.shadow}" opacity=".3"/>
+    <ellipse cx="159" cy="220" rx="8" ry="5.5" fill="${sk.shadow}" opacity=".3"/>`;
+
   const glasses = pers === 'formal'
     ? `<path d="M97 160 Q97 182 122 182 Q147 182 147 160 Q147 142 122 142 Q97 142 97 160Z" fill="none" stroke="${hairCol}" stroke-width="3.5" opacity=".78"/>
        <path d="M153 160 Q153 182 178 182 Q203 182 203 160 Q203 142 178 142 Q153 142 153 160Z" fill="none" stroke="${hairCol}" stroke-width="3.5" opacity=".78"/>
-       <line x1="147" y1="159" x2="153" y2="159" stroke="${hairCol}" stroke-width="3" opacity=".78"/>
-       <path d="M97 155 L82 148" stroke="${hairCol}" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
-       <path d="M203 155 L218 148" stroke="${hairCol}" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
-       <path d="M97 160 Q97 182 122 182 Q147 182 147 160 Q147 142 122 142 Q97 142 97 160Z" fill="${acc}" opacity=".07"/>`
+       <line x1="147" y1="159" x2="153" y2="159" stroke="${hairCol}" stroke-width="3" opacity=".78"/>`
     : '';
 
-  // ── NECK ──
-  const neck = `
-    <rect x="129" y="292" width="42" height="58" rx="19" fill="${sk.neck}"/>
-    <rect x="133" y="292" width="34" height="58" rx="17" fill="${sk.face}" opacity=".5"/>
-  `;
-
-  // ── SHIRT ──
-  const shirtFem = `
-    <ellipse cx="150" cy="395" rx="120" ry="58" fill="${acc}" opacity=".96"/>
-    <path d="M118 345 Q134 358 150 374 Q166 358 182 345 Q168 338 150 336 Q132 338 118 345Z" fill="${acc}" opacity=".85"/>
-    <path d="M150 336 L150 374" stroke="white" stroke-width="1.5" opacity=".18"/>
-  `;
+  const neck = `<rect x="129" y="292" width="42" height="58" rx="19" fill="${sk.neck}"/>`;
   const shirtMale = `
     <ellipse cx="150" cy="398" rx="126" ry="58" fill="${acc}" opacity=".96"/>
     <path d="M114 344 L148 378 L152 378 L186 344 Q170 336 150 334 Q130 336 114 344Z" fill="${acc}" opacity=".85"/>
-    <path d="M114 344 L148 378 M186 344 L152 378" stroke="white" stroke-width="1.5" opacity=".15"/>
-    <rect x="148" y="355" width="4" height="42" rx="2" fill="white" opacity=".15"/>
-  `;
-
-  // ── FACE SHADING ──
-  const shading = `
-    <ellipse cx="90" cy="208" rx="25" ry="30" fill="${sk.shadow}" opacity=".16"/>
-    <ellipse cx="210" cy="208" rx="25" ry="30" fill="${sk.shadow}" opacity=".16"/>
-    <ellipse cx="150" cy="138" rx="34" ry="22" fill="white" opacity=".10"/>
-    <ellipse cx="150" cy="278" rx="38" ry="10" fill="${sk.shadow}" opacity=".22"/>
-  `;
-
-  // ── UNIQUE ID to avoid SVG defs collision ──
-  const uid = Math.random().toString(36).slice(2, 7);
+    <rect x="148" y="355" width="4" height="42" rx="2" fill="white" opacity=".15"/>`;
 
   return `
     <defs>
@@ -1149,65 +1074,23 @@ function buildPortraitSVG(gender, pers, speaking) {
         <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="rgba(0,0,0,.42)"/>
       </filter>
     </defs>
-
-    <!-- Background -->
     <rect width="300" height="420" fill="url(#bg${uid})"/>
-    <ellipse cx="150" cy="110" rx="105" ry="105" fill="${acc}" opacity=".06"/>
-    <ellipse cx="150" cy="390" rx="155" ry="75" fill="${acc}" opacity=".05"/>
-
-    <!-- Hair back -->
-    ${isFem ? femaleHair : pers === 'formal' ? maleFormal : maleHair}
-
-    <!-- Neck -->
+    ${pers === 'formal' ? maleHairFormal : maleHairNormal}
     ${neck}
-
-    <!-- Face base -->
     <ellipse cx="150" cy="190" rx="72" ry="82" fill="url(#face${uid})" filter="url(#faceDrop${uid})"/>
-
-    <!-- Ears -->
     <ellipse cx="78" cy="200" rx="13" ry="20" fill="${sk.face}"/>
-    <ellipse cx="80" cy="200" rx="7.5" ry="13" fill="${sk.shadow}" opacity=".4"/>
     <ellipse cx="222" cy="200" rx="13" ry="20" fill="${sk.face}"/>
-    <ellipse cx="220" cy="200" rx="7.5" ry="13" fill="${sk.shadow}" opacity=".4"/>
-
-    <!-- Face shading -->
-    ${shading}
-
-    <!-- Eyebrows -->
+    <ellipse cx="90" cy="208" rx="25" ry="30" fill="${sk.shadow}" opacity=".16"/>
+    <ellipse cx="210" cy="208" rx="25" ry="30" fill="${sk.shadow}" opacity=".16"/>
     ${brows}
-
-    <!-- Eyes -->
     ${eyes}
-
-    <!-- Glasses -->
     ${glasses}
-
-    <!-- Nose -->
     ${nose}
-
-    <!-- Blush -->
-    ${blush}
-
-    <!-- Mouth -->
     ${mouthSVG}
-
-    <!-- Earrings (female) -->
-    ${earrings}
-
-    <!-- Hair front (over face) -->
-    ${isFem
-      ? `<ellipse cx="150" cy="86" rx="74" ry="40" fill="${hairCol}"/>
-         <path d="M76 112 Q80 78 108 68" stroke="${hairCol}" stroke-width="22" fill="none" stroke-linecap="round"/>
-         <path d="M224 112 Q220 78 192 68" stroke="${hairCol}" stroke-width="22" fill="none" stroke-linecap="round"/>
-         <path d="M106 44 Q148 28 192 44" stroke="${hairHi}" stroke-width="6" fill="none" stroke-linecap="round" opacity=".35"/>
-         <path d="M112 52 Q150 36 188 52" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" opacity=".10"/>`
-      : `<ellipse cx="150" cy="80" rx="70" ry="30" fill="${hairCol}"/>
-         <ellipse cx="82" cy="100" rx="12" ry="18" fill="${hairCol}"/>
-         <ellipse cx="218" cy="100" rx="12" ry="18" fill="${hairCol}"/>`
-    }
-
-    <!-- Shirt -->
-    ${isFem ? shirtFem : shirtMale}
+    <ellipse cx="150" cy="80" rx="70" ry="30" fill="${hairCol}"/>
+    <ellipse cx="82" cy="100" rx="12" ry="18" fill="${hairCol}"/>
+    <ellipse cx="218" cy="100" rx="12" ry="18" fill="${hairCol}"/>
+    ${shirtMale}
   `;
 }
 
@@ -1320,42 +1203,46 @@ async function loadProfile(){
     const r=await fetch(API+'/api/profile',{headers:{Authorization:'Bearer '+S.token}});
     if(r.ok){
       const p=await r.json();
-      // Profile exists — load everything and go straight to app
       Object.assign(S,{
-        profile:p,
-        langData:p.langData||{},
-        lang:p.lang||'en',
-        gender:p.gender||'female',
-        pers:p.pers||'friendly',
-        lives:p.lives??12,
-        streak:p.streak||0,
-        gameStats:p.gameStats||{played:0,correct:0,bestStreak:0,score:0},
-        lessonCount:p.lessonCount||0,
-        convCount:p.convCount||0,
-        exerciseScore:p.exerciseScore||0
+        profile:p, langData:p.langData||{}, lang:p.lang||'en',
+        gender:p.gender||'female', pers:p.pers||'friendly', lives:p.lives??12,
+        streak:p.streak||0, gameStats:p.gameStats||{played:0,correct:0,bestStreak:0,score:0},
+        lessonCount:p.lessonCount||0, convCount:p.convCount||0, exerciseScore:p.exerciseScore||0
       });
-      // Only show onboarding if profile explicitly not done
+      // Cache obDone per user so it survives API failures
+      const uid=S.user?.id||'';
+      if(p.obDone){
+        try{localStorage.setItem('lingua_ob_'+uid,'1');}catch{}
+      }
       if(!p.obDone){
         showOB();
       }else{
         initApp();
       }
     }else if(r.status===401){
-      // Token expired — try refresh
       try{
         const{data:{session}}=await sb.auth.refreshSession();
         if(session){S.token=session.access_token;await loadProfile();}
-        else{showScr('auth');}
+        else showScr('auth');
       }catch{showScr('auth');}
     }else{
-      // Profile not in DB yet — truly new user, show onboarding
-      S.profile={name:S.user.user_metadata?.name||S.user.email?.split('@')[0]||'Aluno'};
-      showOB();
+      // API error — check local cache before showing OB
+      const uid=S.user?.id||'';
+      const cachedOB=localStorage.getItem('lingua_ob_'+uid);
+      S.profile={name:S.user?.user_metadata?.name||S.user?.email?.split('@')[0]||'Aluno'};
+      if(cachedOB==='1'){
+        // User already did OB — go to app even if API failed
+        initApp();
+      }else{
+        showOB();
+      }
     }
   }catch(ex){
     console.warn('loadProfile error:',ex);
-    // Network error — if we have some cached state, still try to show app
-    if(S.profile?.obDone){
+    const uid=S.user?.id||'';
+    let cachedOB=false;
+    try{cachedOB=localStorage.getItem('lingua_ob_'+uid)==='1';}catch{}
+    if(S.profile?.obDone||cachedOB){
       initApp();
     }else{
       S.profile={name:S.user?.user_metadata?.name||'Aluno'};
@@ -1597,6 +1484,8 @@ async function obFinish(){
     learnStyle:OB.learnStyle,difficulty:OB.difficulty||[],prevExp:OB.prevExp||[],extra:OB.extra
   });
   S.gender=OB.gender||'female';S.pers=OB.pers||'friendly';
+  // Cache obDone so user never sees OB again even on API failure
+  try{localStorage.setItem('lingua_ob_'+(S.user?.id||''),'1');}catch{}
   await saveProfile();
   startTest(S.lang);
 }
@@ -2757,21 +2646,74 @@ async function sendDoubt(){
 // ════════════════════════════════════════
 function openWeeklyChallenge(){
   const box=document.getElementById('chalBox');
-  box.innerHTML=`<div class="m-title">🏆 Desafio da Semana</div><div class="m-sub">Complete e ganhe +50 XP + 1 vida extra!</div>
-    <div style="background:linear-gradient(135deg,#fef3c7,#fffbeb);border:1.5px solid var(--gold);border-radius:13px;padding:15px;margin-bottom:12px;text-align:center"><div style="font-size:30px;margin-bottom:6px">✍️</div><div style="font-size:13px;font-weight:700">Escreva em ${LANGS[S.lang].name}</div><div style="font-size:12px;color:var(--txt2);margin-top:4px">Escreva 5 frases sobre algo que aconteceu recentemente.</div></div>
-    <textarea id="chalTxt" style="width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:14px;outline:none;resize:none;min-height:100px" placeholder="Escreva aqui..."></textarea>
-    <div class="m-footer"><button class="btn-back" onclick="closeChal()">Cancelar</button><button class="btn-next" onclick="submitChal()">Enviar ✓</button></div>`;
+  const lang=LANGS[S.lang].name;
+  box.innerHTML=`
+    <div class="m-title">🏆 Desafio da Semana</div>
+    <div class="m-sub">Complete para ganhar +50 XP + 1 vida extra!</div>
+    <div style="background:linear-gradient(135deg,#fef3c7,#fffbeb);border:1.5px solid var(--gold);border-radius:13px;padding:15px;margin-bottom:12px">
+      <div style="font-size:28px;text-align:center;margin-bottom:6px">✍️</div>
+      <div style="font-size:13px;font-weight:700;text-align:center">Escreva em ${lang}</div>
+      <div style="font-size:12px;color:var(--txt2);margin-top:6px;line-height:1.6">
+        Escreva <strong>pelo menos 5 frases reais</strong> em ${lang}.<br>
+        Pode ser sobre seu dia, planos, opinião, qualquer assunto.<br>
+        <span style="color:var(--red);font-size:11px">⚠️ Campo vazio ou frases sem sentido não serão aceitos.</span>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:5px" id="chalCounter">0 palavras • 0 frases</div>
+    <textarea id="chalTxt" style="width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:14px;outline:none;resize:none;min-height:130px;transition:border-color .2s" placeholder="Escreva suas frases em ${lang} aqui..." oninput="updateChalCounter()"></textarea>
+    <div id="chalError" style="color:var(--red);font-size:12px;margin-top:5px;display:none"></div>
+    <div class="m-footer">
+      <button class="btn-back" onclick="closeChal()">Cancelar</button>
+      <button class="btn-next" onclick="submitChal()">Enviar para correção ✓</button>
+    </div>`;
   document.getElementById('chalModal').classList.remove('hidden');
+}
+function updateChalCounter(){
+  const txt=document.getElementById('chalTxt')?.value||'';
+  const words=txt.trim().split(/\s+/).filter(w=>w.length>0).length;
+  const sentences=txt.split(/[.!?]+/).filter(s=>s.trim().length>3).length;
+  const counter=document.getElementById('chalCounter');
+  if(counter){
+    counter.textContent=words+' palavras • '+sentences+' frases';
+    counter.style.color=sentences>=5?'var(--green)':words>10?'var(--gold)':'var(--muted)';
+  }
 }
 function closeChal(){document.getElementById('chalModal').classList.add('hidden');}
 async function submitChal(){
-  const txt=V('chalTxt');if(!txt||txt.length<10){showToast('Escreva pelo menos uma frase!');return;}
-  const box=document.getElementById('chalBox');box.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">⏳ Corrigindo...</div>';
+  const txt=V('chalTxt');
+  const errEl=document.getElementById('chalError');
+  const ta=document.getElementById('chalTxt');
+  if(!txt){
+    if(errEl){errEl.textContent='❌ Campo vazio! Escreva suas frases antes de enviar.';errEl.style.display='block';}
+    if(ta)ta.style.borderColor='var(--red)';
+    showToast('⚠️ Escreva algo antes de enviar!');return;
+  }
+  const words=txt.trim().split(/\s+/).filter(w=>w.length>1).length;
+  if(words<15){
+    if(errEl){errEl.textContent='❌ Escreva pelo menos 5 frases completas (mínimo ~15 palavras).';errEl.style.display='block';}
+    if(ta)ta.style.borderColor='var(--red)';
+    showToast('⚠️ Escreva pelo menos 5 frases para ganhar a recompensa!');return;
+  }
+  const uniqueWords=new Set(txt.toLowerCase().split(/\s+/));
+  if(uniqueWords.size<8){
+    if(errEl){errEl.textContent='❌ Escreva frases variadas com sentido.';errEl.style.display='block';}
+    if(ta)ta.style.borderColor='var(--red)';return;
+  }
+  if(errEl)errEl.style.display='none';
+  if(ta)ta.style.borderColor='var(--green)';
+  const box=document.getElementById('chalBox');
+  box.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">⏳ Corrigindo sua escrita...</div>';
   const ldata=ld();
   try{
-    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:`Correct this ${LANGS[S.lang].name} text from a ${LEVELS[ldata.level||0]} student:\n"${txt}"`}],systemPrompt:'Respond in Brazilian Portuguese. Show corrected version, list errors, give encouragement.',userId:S.user?.id})});
-    const d=await r.json();gainLife(1);setLd({xp:(ldata.xp||0)+50,totalLessons:(ldata.totalLessons||0)+1});recalcLevel();saveProfile();
-    box.innerHTML=`<div class="m-title">🎉 Parabéns!</div><div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:13px;margin-bottom:11px;font-size:13px;line-height:1.7">${(d.reply||'').replace(/\n/g,'<br>')}</div><div style="background:linear-gradient(135deg,#fef3c7,#fffbeb);border:1.5px solid var(--gold);border-radius:11px;padding:11px;text-align:center;font-size:13px;font-weight:700;color:#92400e">🎁 +50 XP + 1 vida extra conquistados!</div><div class="m-footer"><button class="btn-p" onclick="closeChal()">Fechar</button></div>`;
+    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:`Correct this ${LANGS[S.lang].name} text from a ${LEVELS[ldata.level||0]} student:\n\n"${txt}"\n\nProvide: 1) corrected version, 2) errors explained, 3) encouragement.`}],
+        systemPrompt:'Respond in Brazilian Portuguese. Be thorough and educational.',userId:S.user?.id})});
+    const d=await r.json();
+    gainLife(1);setLd({xp:(ldata.xp||0)+50,totalLessons:(ldata.totalLessons||0)+1});recalcLevel();saveProfile();
+    box.innerHTML=`<div class="m-title">🎉 Desafio Concluído!</div>
+      <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:13px;margin-bottom:11px;font-size:13px;line-height:1.7">${(d.reply||'').replace(/\n/g,'<br>')}</div>
+      <div style="background:linear-gradient(135deg,#fef3c7,#fffbeb);border:1.5px solid var(--gold);border-radius:11px;padding:11px;text-align:center;font-size:13px;font-weight:700;color:#92400e">🎁 +50 XP + 1 vida extra conquistados!</div>
+      <div class="m-footer"><button class="btn-p" onclick="closeChal()">Fechar</button></div>`;
   }catch{closeChal();}
 }
 
@@ -2885,11 +2827,17 @@ async function startQuizCat(catIdx){
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
-          messages:[{role:'user',content:`Create 8 quiz questions: ${catInstructions[cat.id]||catInstructions.random}.
-Level: ${LEVELS[ldata.level||0]}.${interests?' Student interests: '+interests+'.':''} Make questions interesting and varied.
+          messages:[{role:'user',content:`Create 8 quiz questions about: ${catInstructions[cat.id]||catInstructions.random}.
+Level: ${LEVELS[ldata.level||0]}.${interests?' Student interests: '+interests+'.':''}
+
+CRITICAL RULES:
+- ALL questions and ALL answer options MUST be written in ${LANGS[S.lang].name} ONLY
+- Do NOT use Portuguese for questions or options — only for explanations
+- Make questions interesting and varied in difficulty
+
 Return ONLY valid JSON (no markdown, no text outside JSON):
-{"questions":[{"question":"...","options":["A: ...","B: ...","C: ...","D: ..."],"answer":"A: ...","explanation":"brief explanation in Portuguese"}]}`}],
-          systemPrompt:'Return ONLY valid JSON. No markdown. No text before or after the JSON object.',
+{"questions":[{"question":"question text in ${LANGS[S.lang].name}","options":["A: option in ${LANGS[S.lang].name}","B: option","C: option","D: option"],"answer":"A: correct option in ${LANGS[S.lang].name}","explanation":"brief explanation in Portuguese"}]}`}],
+          systemPrompt:`Return ONLY valid JSON. No markdown. ALL questions and options MUST be in ${LANGS[S.lang].name}. Only explanations in Portuguese.`,
           userId:S.user?.id
         })
       });
